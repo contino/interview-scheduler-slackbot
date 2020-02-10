@@ -1,0 +1,94 @@
+{
+	"blocks": [
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "Hello, Contini! I checked your interview availability calendar and it looks like you have not added your availability next week (Feb 10 to 14 2020). Your contribution really matters! \n\n *Please select one or more slots from below and I will create an event on the Interview availability calendar for you! :smiley:*"
+			}
+		},
+		{
+			"type": "divider"
+		},
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "Monday 3pm - 4pm EST LC first round."
+			},
+			"accessory": {
+				"type": "button",
+				"text": {
+					"type": "plain_text",
+					"text": "Signup",
+					"emoji": true
+				},
+				"value": "click_me_123"
+			}
+		},
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "Tuesday 10am - 11am EST LC first round. "
+			},
+			"accessory": {
+				"type": "button",
+				"text": {
+					"type": "plain_text",
+					"text": "Signup",
+					"emoji": true
+				},
+				"value": "click_me_123"
+			}
+		},
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "Wednesday 9am - 10am EST LC first round."
+			},
+			"accessory": {
+				"type": "button",
+				"text": {
+					"type": "plain_text",
+					"text": "Signup",
+					"emoji": true
+				},
+				"value": "click_me_123"
+			}
+		},
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "Wednesday 11am - 12pm EST LC first round."
+			},
+			"accessory": {
+				"type": "button",
+				"text": {
+					"type": "plain_text",
+					"text": "Signup",
+					"emoji": true
+				},
+				"value": "click_me_123"
+			}
+		},
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "Friday 3pm - 4pm EST LC first round."
+			},
+			"accessory": {
+				"type": "button",
+				"text": {
+					"type": "plain_text",
+					"text": "Signup",
+					"emoji": true
+				},
+				"value": "click_me_123"
+			}
+		}
+	]
+}
