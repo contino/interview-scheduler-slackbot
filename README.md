@@ -9,7 +9,7 @@ https://developers.google.com/calendar/quickstart/python
 Interview availability calendar id
 `contino.io_eepahmdv2bb1tvhbvv0ictha3g@group.calendar.google.com`
 
-## Thought process / things I need
+## Tasks (check marks indicate completed)
 
 Get current date ✅
 
