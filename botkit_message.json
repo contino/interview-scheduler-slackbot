@@ -20,8 +20,7 @@
 				"type": "button",
 				"text": {
 					"type": "plain_text",
-					"text": "Signup",
-					"emoji": true
+					"text": "Signup"
 				},
 				"value": "click_me_123"
 			}
@@ -36,8 +35,7 @@
 				"type": "button",
 				"text": {
 					"type": "plain_text",
-					"text": "Signup",
-					"emoji": true
+					"text": "Signup"
 				},
 				"value": "click_me_123"
 			}
@@ -52,8 +50,7 @@
 				"type": "button",
 				"text": {
 					"type": "plain_text",
-					"text": "Signup",
-					"emoji": true
+					"text": "Signup"
 				},
 				"value": "click_me_123"
 			}
@@ -68,8 +65,7 @@
 				"type": "button",
 				"text": {
 					"type": "plain_text",
-					"text": "Signup",
-					"emoji": true
+					"text": "Signup"
 				},
 				"value": "click_me_123"
 			}
@@ -84,8 +80,7 @@
 				"type": "button",
 				"text": {
 					"type": "plain_text",
-					"text": "Signup",
-					"emoji": true
+					"text": "Signup"
 				},
 				"value": "click_me_123"
 			}

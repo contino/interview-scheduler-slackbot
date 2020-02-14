@@ -11,14 +11,32 @@ Interview availability calendar id
 
 ## Thought process / things I need
 
-Get current date
+Get current date ✅
 
-Generate next week's dates
+Generate next week's dates ✅
 
-Read specific user's calendar for above dates
+List Slack Users ✅
+
+Get Slack User's name ✅
+
+Get Slack User's email ✅
+
+Get Slack User's DM ID ✅
+
+DM User ✅
+
+Read Contino interview availability calendar ✅
+
+Read specific user's calendar for above dates 
 
 Identify free slots in their calendar that span 1 hour (avoid lunch time)
 
 Use first 5 free slots and generate json payload
 
-Deliver payload
+Deliver payload to user's direct message channel
+
+Capture user response json (button click)
+
+Build payload for google calendar
+
+Make api call to google calendar

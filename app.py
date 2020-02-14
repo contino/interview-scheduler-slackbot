@@ -21,12 +21,10 @@ def verify_slack_token(request_token):
         print("Received {} but was expecting {}".format(request_token, SLACK_VERIFICATION_TOKEN))
         return make_response("Request contains invalid Slack verification token", 403)
 
-
 # The endpoint Slack will load your menu options from
 @app.route("/slack/message_options", methods=["POST"])
 def message_options():
     # Parse the request payload
-
     form_json = json.loads(request.form["payload"])
 
     # Verify that the request came from Slack
@@ -48,7 +46,6 @@ def message_options():
 
     # Load options dict as JSON and respond to Slack
     return Response(json.dumps(menu_options), mimetype='application/json')
-
 
 # The endpoint Slack will send the user's menu selection to
 @app.route("/slack/message_actions", methods=["POST"])
@@ -83,6 +80,10 @@ def message_actions():
 
     # Send an HTTP 200 response with empty body so Slack knows we're done here
     return make_response("", 200)
+
+# with open('botkit_message.json') as msg_file:
+#     intro_msg = json.load(msg_file)
+#     print(intro_msg)
 
 intro_msg  = json.dumps([
         {
@@ -178,10 +179,19 @@ intro_msg  = json.dumps([
 
 slack_client.api_call(
   "chat.postMessage",
-  channel="#random",
+  channel="UTU6JPJG6",
   attachments=intro_msg
 )
 
+# print json.dumps(slack_client.api_call("users.list"), indent=2)
+
+payload = slack_client.api_call("users.list")
+json_formatted_str = json.dumps(payload, indent=2)
+# print(json_formatted_str)
+
+for item in payload["members"]:
+  print item["id"] + " " + item["profile"]["real_name_normalized"]
+
 # Start the Flask server
-if __name__ == "__main__":
-    app.run()
+# if __name__ == "__main__":
+#     app.run()
