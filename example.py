@@ -1,8 +1,3 @@
-# export SLACK_BOT_TOKEN='xoxb-944033221973-945883202711-rJha13NNmX8V32M3OBcisif9'
-# export SLACK_SIGNING_SECRET='42cc23c07914b515b30a583facf8419a'
-# export SLACK_VERIFICATION_TOKEN='lb5fLRHkn7gV7FKsGqgiK7vm'
-
-
 from flask import Flask, request, make_response, Response
 import os
 import json
@@ -31,8 +26,6 @@ def verify_slack_token(request_token):
 @app.route("/slack/message_options", methods=["POST"])
 def message_options():
     # Parse the request payload
-
-    # print request.form["payload"]
 
     form_json = json.loads(request.form["payload"])
 
@@ -183,7 +176,6 @@ intro_msg  = json.dumps([
         }
     ])
 
-# Send a message with the above attachment, asking the user if they want coffee
 slack_client.api_call(
   "chat.postMessage",
   channel="#random",
