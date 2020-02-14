@@ -25,6 +25,8 @@ Get Slack User's DM ID ✅
 
 DM User ✅
 
+Generate BotKit message with buttons and deliver payload ✅
+
 Read Contino interview availability calendar ✅
 
 Read specific user's calendar for above dates 
