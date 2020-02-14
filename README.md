@@ -42,3 +42,7 @@ Capture user response json (button click)
 Build payload for google calendar
 
 Make api call to google calendar
+
+## Sample message delivered to user
+
+![screen capture](./images/interviewbot.png)
