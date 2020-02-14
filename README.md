@@ -41,7 +41,7 @@ Capture user response json (button click)
 
 Build payload for google calendar
 
-Make api call to google calendar
+Make api call to google calendar to create event/s
 
 ## Sample message delivered to user
 
