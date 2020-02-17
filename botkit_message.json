@@ -24,66 +24,6 @@
 				},
 				"value": "click_me_123"
 			}
-		},
-		{
-			"type": "section",
-			"text": {
-				"type": "mrkdwn",
-				"text": "Tuesday 10am - 11am EST LC first round. "
-			},
-			"accessory": {
-				"type": "button",
-				"text": {
-					"type": "plain_text",
-					"text": "Signup"
-				},
-				"value": "click_me_123"
-			}
-		},
-		{
-			"type": "section",
-			"text": {
-				"type": "mrkdwn",
-				"text": "Wednesday 9am - 10am EST LC first round."
-			},
-			"accessory": {
-				"type": "button",
-				"text": {
-					"type": "plain_text",
-					"text": "Signup"
-				},
-				"value": "click_me_123"
-			}
-		},
-		{
-			"type": "section",
-			"text": {
-				"type": "mrkdwn",
-				"text": "Wednesday 11am - 12pm EST LC first round."
-			},
-			"accessory": {
-				"type": "button",
-				"text": {
-					"type": "plain_text",
-					"text": "Signup"
-				},
-				"value": "click_me_123"
-			}
-		},
-		{
-			"type": "section",
-			"text": {
-				"type": "mrkdwn",
-				"text": "Friday 3pm - 4pm EST LC first round."
-			},
-			"accessory": {
-				"type": "button",
-				"text": {
-					"type": "plain_text",
-					"text": "Signup"
-				},
-				"value": "click_me_123"
-			}
 		}
 	]
 }]

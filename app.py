@@ -1,10 +1,11 @@
+#!/usr/local/bin/python3
+
 from flask import Flask, request, make_response, Response
 import os
 import json
 
 from slackclient import SlackClient
 
-# Your app's Slack bot user token
 SLACK_BOT_TOKEN = os.environ["SLACK_BOT_TOKEN"]
 SLACK_VERIFICATION_TOKEN = os.environ["SLACK_VERIFICATION_TOKEN"]
 
@@ -13,6 +14,33 @@ slack_client = SlackClient(SLACK_BOT_TOKEN)
 
 # Flask webserver for incoming traffic from Slack
 app = Flask(__name__)
+
+def json_pretty(json_block):
+    json_formatted_str = json.dumps(json_block, indent=2)
+    return json_formatted_str
+
+# def get_user_calendar_events():
+
+def get_user_list():
+
+    with open('botkit_message.json') as msg_file:
+        intro_msg = json.load(msg_file)
+
+    payload = slack_client.api_call("users.list")
+    # print json_pretty(payload)
+
+    for item in payload["members"]:
+        if "email" in item["profile"]:
+
+            print(item["id"] + " " + item["profile"]["real_name_normalized"] + " " + item["profile"]["email"])
+
+            response = slack_client.api_call(
+              "chat.postMessage",
+              channel=item["id"],
+              attachments=intro_msg
+            )
+
+            print("Message delivered:" + " " + str(response["ok"]))
 
 # Helper for verifying that requests came from Slack
 def verify_slack_token(request_token):
@@ -28,8 +56,8 @@ def message_actions():
     # Parse the request payload
     form_json = json.loads(request.form["payload"])
 
-    # json_formatted_str = json.dumps(form_json, indent=2)
-    # print(json_formatted_str)
+    json_formatted_str = json.dumps(form_json, indent=2)
+    print(json_formatted_str)
 
     # Verify that the request came from Slack
     verify_slack_token(form_json["token"])
@@ -37,7 +65,7 @@ def message_actions():
     # Check to see what the user's selection was and update the message accordingly
     selection = form_json["actions"][0]["value"]
 
-    print selection
+    print(selection)
 
     # if selection == "cappuccino":
     #     message_text = "cappuccino"
@@ -55,28 +83,7 @@ def message_actions():
     # Send an HTTP 200 response with empty body so Slack knows we're done here
     return make_response("", 200)
 
-with open('botkit_message.json') as msg_file:
-    intro_msg = json.load(msg_file)
+get_user_list()
 
-
-payload = slack_client.api_call(
-  "chat.postMessage",
-  channel="#trashbin",
-  attachments=intro_msg
-)
-
-json_formatted_str = json.dumps(payload, indent=2)
-print(json_formatted_str)
-
-# print json.dumps(slack_client.api_call("users.list"), indent=2)
-
-# payload = slack_client.api_call("users.list")
-# json_formatted_str = json.dumps(payload, indent=2)
-# # print(json_formatted_str)
-
-# for item in payload["members"]:
-#   print item["id"] + " " + item["profile"]["real_name_normalized"]
-
-# Start the Flask server
 # if __name__ == "__main__":
 #     app.run()
