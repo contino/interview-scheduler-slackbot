@@ -2,6 +2,7 @@
 
 from __future__ import print_function
 import datetime
+import dateutil.parser
 from pytz import timezone
 import pickle
 import os.path
@@ -42,7 +43,7 @@ def main():
 
     events = get_events_for_next_week(service,next_weekday(0),next_weekday(5),INTERVIEW_AVAIL_CAL)
     
-    get_free_slots_for_calendar(service,INTERVIEW_AVAIL_CAL,events,next_weekday(0),next_weekday(5))
+    get_free_slots_for_week(service,INTERVIEW_AVAIL_CAL,events,next_weekday(0),next_weekday(5))
 
     # get_calendars_list(service)
 
@@ -64,7 +65,7 @@ def get_events_for_next_week(service,next_weekday,last_weekday,calendar):
 
 
 
-def get_free_slots_for_calendar(service,calendar,events,next_weekday,last_weekday):
+def get_free_slots_for_week(service,calendar,events,next_weekday,last_weekday):
 
     DEFAULT_TIMEZONE = get_calendar_tz(service,calendar)
 
@@ -72,7 +73,7 @@ def get_free_slots_for_calendar(service,calendar,events,next_weekday,last_weekda
     last_weekday = timezone(DEFAULT_TIMEZONE).localize(last_weekday)
 
     day_start_hour = 8 # 8am
-    day_end_hour = 17 # 5pm
+    day_end_hour = 18 # 5pm
     event_length = 60 #mins
 
     current_day = next_weekday
@@ -92,37 +93,51 @@ def get_free_slots_for_calendar(service,calendar,events,next_weekday,last_weekda
 
         current_day_busy_events = eventsResult["calendars"][calendar]["busy"]
 
-        event_start_time = datetime.datetime.combine(current_day.date(), datetime.time(day_start_hour))
+        day_start_time = datetime.datetime.combine(current_day.date(), datetime.time(day_start_hour))
         day_end_time = datetime.datetime.combine(current_day.date(), datetime.time(day_end_hour))
 
-        print(current_day)
+        # print(day_start_time)
 
-        while event_start_time <= day_end_time:
+        print(current_day.date())
 
-            event_end_time = event_start_time + datetime.timedelta(hours=1)
-            print(timezone(DEFAULT_TIMEZONE).localize(event_start_time).isoformat())
+        hours = (timezone(DEFAULT_TIMEZONE).localize(day_start_time), timezone(DEFAULT_TIMEZONE).localize(day_end_time))
 
-            #check if there is an event this day between event_start_time and event_end_time
-            #make sure start time and end time are not between any of the busy start and end times 
+        # print(hours)
 
-            if current_day_busy_events:
+        appointments = []
 
-                for busy_event in current_day_busy_events:
-                
-                    busy_event_start = datetime.strptime(busy_event["start"])
-                    busy_event_end = datetime.strptime(busy_event["end"])
+        if current_day_busy_events:
+            for busy_event in current_day_busy_events:
+                busy_event_start = (dateutil.parser.parse(busy_event["start"]))
+                busy_event_end = (dateutil.parser.parse(busy_event["end"]))
+                appointments.append((busy_event_start,busy_event_end))
 
-                    if event_start_time < busy_event_start && 
+        # for appointment in appointments:
+        #     print(appointment)
 
+        duration = datetime.timedelta(hours=1)
 
-            # event_start_time = timezone(DEFAULT_TIMEZONE).localize(event_start_time).isoformat()
-            # day_end_time = timezone(DEFAULT_TIMEZONE).localize(day_end_time).isoformat()
-
-            event_start_time = event_end_time
+        get_free_slots_for_day(hours, appointments, duration)
 
         # json_pretty(eventsResult)
 
         current_day += datetime.timedelta(days=1)
+
+def get_free_slots_for_day(hours, appointments, duration):
+
+    slots = sorted([(hours[0], hours[0])] + appointments + [(hours[1], hours[1])])
+
+    for start, end in ((slots[i][1], slots[i+1][0]) for i in range(len(slots)-1)):
+    
+        # assert start <= end, "Cannot attend all appointments"
+    
+        while start + duration <= end:
+    
+            # print ("{:%H:%M} - {:%H:%M}".format(start, start + duration))
+
+            print(start.isoformat() + " - " + (start + duration).isoformat())
+    
+            start += duration
 
 def get_calendar_tz(service,calendar):
 
