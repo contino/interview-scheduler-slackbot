@@ -1,29 +1,17 @@
 [{
 	"blocks": [
-		{
-			"type": "section",
-			"text": {
-				"type": "mrkdwn",
-				"text": "Hello, Contini! I checked your interview availability calendar and it looks like you have not added your availability next week (Feb 10 to 14 2020). Your contribution really matters! \n\n *Please select one or more slots from below and I will create an event on the Interview availability calendar for you! :smiley:*"
-			}
-		},
-		{
-			"type": "divider"
-		},
-		{
-			"type": "section",
-			"text": {
-				"type": "mrkdwn",
-				"text": "Monday 3pm - 4pm EST LC first round."
-			},
-			"accessory": {
-				"type": "button",
-				"text": {
+	{
+		"type": "actions",
+		"block_id": "actions1",
+		"elements": [
+			{
+				"type": "external_select",
+				"placeholder": {
 					"type": "plain_text",
-					"text": "Signup"
+					"text": "Which witch is the witchiest witch?"
 				},
-				"value": "click_me_123"
+				"action_id": "select_2"
 			}
-		}
-	]
+		]
+	}]
 }]

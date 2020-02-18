@@ -2,6 +2,7 @@
 
 from __future__ import print_function
 import datetime
+from pytz import timezone
 import pickle
 import os.path
 from googleapiclient.discovery import build
@@ -12,21 +13,9 @@ import json
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
 
-INTERVIEW_AVAIL_CAL='contino.io_eepahmdv2bb1tvhbvv0ictha3g@group.calendar.google.com'
-DEFAULT_TIMEZONE = 'America/New_York'
-
-def next_weekday(weekday):
-    
-    today = datetime.datetime.today()
-
-    days_ahead = weekday - today.weekday()
-
-    if days_ahead <= 0:
-        days_ahead += 7
-
-    next_weekday = today + datetime.timedelta(days_ahead)
-    
-    return datetime.datetime.combine(next_weekday.date(), datetime.time(0,0,0,0))
+# INTERVIEW_AVAIL_CAL='contino.io_eepahmdv2bb1tvhbvv0ictha3g@group.calendar.google.com'
+INTERVIEW_AVAIL_CAL = 'ashok.gadepalli@contino.io'
+# DEFAULT_TIMEZONE = 'America/New_York'
 
 def main():
 
@@ -51,9 +40,9 @@ def main():
 
     # print(next_weekday(5).isoformat())
 
-    # events = get_events_for_next_week(service,next_weekday(0).isoformat(),next_weekday(5).isoformat(),INTERVIEW_AVAIL_CAL)
+    events = get_events_for_next_week(service,next_weekday(0),next_weekday(5),INTERVIEW_AVAIL_CAL)
     
-    # get_free_slots_for_calendar(events)
+    get_free_slots_for_calendar(service,INTERVIEW_AVAIL_CAL,events,next_weekday(0),next_weekday(5))
 
     # get_calendars_list(service)
 
@@ -64,8 +53,8 @@ def main():
 def get_events_for_next_week(service,next_weekday,last_weekday,calendar):
 
     events_result = service.events().list(  calendarId=calendar,
-                                            timeMin=next_weekday + 'Z',
-                                            timeMax=last_weekday + 'Z', 
+                                            timeMin=next_weekday.isoformat() + 'Z',
+                                            timeMax=last_weekday.isoformat() + 'Z', 
                                             singleEvents=True,
                                             orderBy='startTime').execute()
 
@@ -73,23 +62,73 @@ def get_events_for_next_week(service,next_weekday,last_weekday,calendar):
 
     return events
 
-def get_free_slots_for_calendar(events):
 
-    if not events:
-        print('No upcoming events found.')
-    for event in events:
 
-        #if tz is not set, defaults to DEFAULT_TIMEZONE
-        if "timeZone" not in event["start"]:
-            event["start"]["timeZone"] = DEFAULT_TIMEZONE
+def get_free_slots_for_calendar(service,calendar,events,next_weekday,last_weekday):
 
-        print( event["start"]["dateTime"].strip('\"') + " " + event["start"]["timeZone"].strip('\"') + " " + event["creator"]["email"].strip('\"'))
+    DEFAULT_TIMEZONE = get_calendar_tz(service,calendar)
+
+    next_weekday = timezone(DEFAULT_TIMEZONE).localize(next_weekday)
+    last_weekday = timezone(DEFAULT_TIMEZONE).localize(last_weekday)
+
+    day_start_hour = 8 # 8am
+    day_end_hour = 17 # 5pm
+    event_length = 60 #mins
+
+    current_day = next_weekday
+
+    while current_day < last_weekday:
+
+        next_day = current_day + datetime.timedelta(days=1)
+        
+        body = {
+            "timeMin": current_day.isoformat(),
+            "timeMax": next_day.isoformat(),
+            "timeZone": get_calendar_tz(service,calendar),
+            "items": [{"id": calendar}]
+        }
+        
+        eventsResult = service.freebusy().query(body=body).execute()
+
+        current_day_busy_events = eventsResult["calendars"][calendar]["busy"]
+
+        event_start_time = datetime.datetime.combine(current_day.date(), datetime.time(day_start_hour))
+        day_end_time = datetime.datetime.combine(current_day.date(), datetime.time(day_end_hour))
+
+        print(current_day)
+
+        while event_start_time <= day_end_time:
+
+            event_end_time = event_start_time + datetime.timedelta(hours=1)
+            print(timezone(DEFAULT_TIMEZONE).localize(event_start_time).isoformat())
+
+            #check if there is an event this day between event_start_time and event_end_time
+            #make sure start time and end time are not between any of the busy start and end times 
+
+            if current_day_busy_events:
+
+                for busy_event in current_day_busy_events:
+                
+                    busy_event_start = datetime.strptime(busy_event["start"])
+                    busy_event_end = datetime.strptime(busy_event["end"])
+
+                    if event_start_time < busy_event_start && 
+
+
+            # event_start_time = timezone(DEFAULT_TIMEZONE).localize(event_start_time).isoformat()
+            # day_end_time = timezone(DEFAULT_TIMEZONE).localize(day_end_time).isoformat()
+
+            event_start_time = event_end_time
+
+        # json_pretty(eventsResult)
+
+        current_day += datetime.timedelta(days=1)
 
 def get_calendar_tz(service,calendar):
 
     calendar_json = service.calendars().get(calendarId=calendar).execute()
 
-    print(calendar_json["timeZone"])
+    return calendar_json["timeZone"]
 
 def get_calendars_list(service):
 
@@ -112,7 +151,19 @@ def get_calendars_list(service):
 
 def json_pretty(json_block):
     json_formatted_str = json.dumps(json_block, indent=2)
-    return json_formatted_str
+    print(json_formatted_str)
+
+def next_weekday(weekday):
+    
+    today = datetime.datetime.today()
+
+    days_ahead = weekday - today.weekday()
+
+    days_ahead += 7
+
+    next_weekday = today + datetime.timedelta(days_ahead)
+    
+    return datetime.datetime.combine(next_weekday.date(), datetime.time(0,0,0,0))
 
 if __name__ == '__main__':
     main()

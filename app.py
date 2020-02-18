@@ -3,7 +3,6 @@
 from flask import Flask, request, make_response, Response
 import os
 import json
-
 from slackclient import SlackClient
 
 SLACK_BOT_TOKEN = os.environ["SLACK_BOT_TOKEN"]
@@ -32,7 +31,9 @@ def get_user_list():
     for item in payload["members"]:
         if "email" in item["profile"]:
 
-            print(item["id"] + " " + item["profile"]["real_name_normalized"] + " " + item["profile"]["email"])
+            # print(item["id"] + " " + item["profile"]["real_name_normalized"] + " " + item["profile"]["email"])
+
+            print(json_pretty(intro_msg))
 
             response = slack_client.api_call(
               "chat.postMessage",
@@ -42,6 +43,8 @@ def get_user_list():
 
             print("Message delivered:" + " " + str(response["ok"]))
 
+            print(json_pretty(response))
+
 # Helper for verifying that requests came from Slack
 def verify_slack_token(request_token):
     if SLACK_VERIFICATION_TOKEN != request_token:
@@ -49,7 +52,47 @@ def verify_slack_token(request_token):
         print("Received {} but was expecting {}".format(request_token, SLACK_VERIFICATION_TOKEN))
         return make_response("Request contains invalid Slack verification token", 403)
 
-# The endpoint Slack will send the user's menu selection to
+@app.route("/slack/options", methods=["POST"])
+def message_options():
+    # Parse the request payload
+    form_json = json.loads(request.form["payload"])
+
+    print(json_pretty(form_json))
+
+    # Verify that the request came from Slack
+    verify_slack_token(form_json["token"])
+
+    # Dictionary of menu options which will be sent as JSON
+    menu_options = {
+      "options": [
+                    {
+                        "text": {
+                            "type": "plain_text",
+                            "text": "Choice 1"
+                        },
+                        "value": "value-0"
+                    },
+                    {
+                        "text": {
+                            "type": "plain_text",
+                            "text": "Choice 2"
+                        },
+                        "value": "value-1"
+                    },
+                    {
+                        "text": {
+                            "type": "plain_text",
+                            "text": "Choice 3"
+                        },
+                        "value": "value-2"
+                    }
+                ]
+    }
+
+    # Load options dict as JSON and respond to Slack
+    return Response(json.dumps(menu_options), mimetype='application/json')
+
+# # The endpoint Slack will send the user's menu selection to
 @app.route("/slack/message_actions", methods=["POST"])
 def message_actions():
 
@@ -85,5 +128,5 @@ def message_actions():
 
 get_user_list()
 
-# if __name__ == "__main__":
-#     app.run()
+if __name__ == "__main__":
+    app.run()

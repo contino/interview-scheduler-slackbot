@@ -9,7 +9,7 @@ https://developers.google.com/calendar/quickstart/python
 Interview availability calendar id
 `contino.io_eepahmdv2bb1tvhbvv0ictha3g@group.calendar.google.com`
 
-## Tasks (check marks indicate completed)
+## Tasks (✅ indicate completed, 👩‍💻 indicates in progress)
 
 Get current date ✅
 
@@ -29,9 +29,11 @@ Generate BotKit message with buttons and deliver payload ✅
 
 Read Contino interview availability calendar ✅
 
-Read specific user's calendar for above dates 
+Read specific user's calendar for above dates ✅
 
-Identify free slots in their calendar that span 1 hour (avoid lunch time)
+Get Busy events from user's calendar on specific day ✅
+
+Identify free slots in their calendar that span 1 hour from above day (avoid lunch time) 👩‍💻
 
 Use first 5 free slots and generate json payload
 
