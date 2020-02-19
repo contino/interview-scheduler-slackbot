@@ -33,9 +33,9 @@ Read specific user's calendar for above dates ✅
 
 Get Busy events from user's calendar on specific day ✅
 
-Identify free slots in their calendar that span 1 hour from above day (avoid lunch time) 👩‍💻
+Identify free slots in their calendar that span 1 hour from above day (avoid lunch time) ✅
 
-Use first 5 free slots and generate json payload
+Use slots fetched to build message for individual user 👩‍💻
 
 Deliver payload to user's direct message channel
 
