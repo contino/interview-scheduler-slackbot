@@ -3,3 +3,4 @@ slackeventsapi>=2.1.0
 Flask>=1.1.1
 certifi
 google-api-python-client==1.6.2
+websocket-client==0.47.0

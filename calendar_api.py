@@ -1,5 +1,4 @@
 #!/usr/local/bin/python3
-
 from __future__ import print_function
 import datetime
 import dateutil.parser
@@ -13,12 +12,11 @@ import json
 
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
-
 # INTERVIEW_AVAIL_CAL='contino.io_eepahmdv2bb1tvhbvv0ictha3g@group.calendar.google.com'
 INTERVIEW_AVAIL_CAL = 'ashok.gadepalli@contino.io'
-# DEFAULT_TIMEZONE = 'America/New_York'
+# calendar_timezone = 'America/New_York'
 
-def main():
+def get_service():
 
     creds = None
 
@@ -39,17 +37,7 @@ def main():
 
     service = build('calendar', 'v3', credentials=creds)
 
-    # print(next_weekday(5).isoformat())
-
-    events = get_events_for_next_week(service,next_weekday(0),next_weekday(5),INTERVIEW_AVAIL_CAL)
-    
-    get_free_slots_for_week(service,INTERVIEW_AVAIL_CAL,events,next_weekday(0),next_weekday(5))
-
-    # get_calendars_list(service)
-
-    # now = datetime.datetime.utcnow().isoformat() + 'Z'
-
-    # print(next_weekday().date() + 'T18:00:10.00000Z')
+    return service
 
 def get_events_for_next_week(service,next_weekday,last_weekday,calendar):
 
@@ -63,20 +51,20 @@ def get_events_for_next_week(service,next_weekday,last_weekday,calendar):
 
     return events
 
-
-
 def get_free_slots_for_week(service,calendar,events,next_weekday,last_weekday):
 
-    DEFAULT_TIMEZONE = get_calendar_tz(service,calendar)
+    calendar_timezone = get_calendar_tz(service,calendar)
 
-    next_weekday = timezone(DEFAULT_TIMEZONE).localize(next_weekday)
-    last_weekday = timezone(DEFAULT_TIMEZONE).localize(last_weekday)
+    next_weekday = timezone(calendar_timezone).localize(next_weekday)
+    last_weekday = timezone(calendar_timezone).localize(last_weekday)
 
     day_start_hour = 8 # 8am
     day_end_hour = 18 # 5pm
-    event_length = 60 #mins
+    duration = datetime.timedelta(hours=1) #interview length
 
     current_day = next_weekday
+
+    slots_for_week = []
 
     while current_day < last_weekday:
 
@@ -96,48 +84,52 @@ def get_free_slots_for_week(service,calendar,events,next_weekday,last_weekday):
         day_start_time = datetime.datetime.combine(current_day.date(), datetime.time(day_start_hour))
         day_end_time = datetime.datetime.combine(current_day.date(), datetime.time(day_end_hour))
 
-        # print(day_start_time)
-
-        print(current_day.date())
-
-        hours = (timezone(DEFAULT_TIMEZONE).localize(day_start_time), timezone(DEFAULT_TIMEZONE).localize(day_end_time))
-
-        # print(hours)
+        hours = (timezone(calendar_timezone).localize(day_start_time), timezone(calendar_timezone).localize(day_end_time))
 
         appointments = []
 
         if current_day_busy_events:
             for busy_event in current_day_busy_events:
+
                 busy_event_start = (dateutil.parser.parse(busy_event["start"]))
                 busy_event_end = (dateutil.parser.parse(busy_event["end"]))
                 appointments.append((busy_event_start,busy_event_end))
 
-        # for appointment in appointments:
-        #     print(appointment)
+        slots_for_day = get_free_slots_for_day(hours, appointments, duration, current_day.date(), calendar_timezone)
 
-        duration = datetime.timedelta(hours=1)
-
-        get_free_slots_for_day(hours, appointments, duration)
-
-        # json_pretty(eventsResult)
+        for slot in slots_for_day:
+            slots_for_week.append(slot)
 
         current_day += datetime.timedelta(days=1)
 
-def get_free_slots_for_day(hours, appointments, duration):
+    return slots_for_week
+
+def get_free_slots_for_day(hours, appointments, duration, date, timezone):
 
     slots = sorted([(hours[0], hours[0])] + appointments + [(hours[1], hours[1])])
 
-    for start, end in ((slots[i][1], slots[i+1][0]) for i in range(len(slots)-1)):
-    
-        # assert start <= end, "Cannot attend all appointments"
-    
-        while start + duration <= end:
-    
-            # print ("{:%H:%M} - {:%H:%M}".format(start, start + duration))
+    slots_for_day = []
 
-            print(start.isoformat() + " - " + (start + duration).isoformat())
-    
+    for start, end in ((slots[i][1], slots[i+1][0]) for i in range(len(slots)-1)):
+
+        while start + duration <= end:
+
+            slot = {}
+            event = {}
+
+            slot['date'] = str(date)
+            slot['timezone'] = timezone
+
+            event['start'] = start.isoformat()
+            event['end'] = (start + duration).isoformat()
+            
+            slot['event'] = event
+
+            slots_for_day.append(slot)
+
             start += duration
+
+    return slots_for_day
 
 def get_calendar_tz(service,calendar):
 

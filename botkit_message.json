@@ -1,17 +1,14 @@
 [{
-	"blocks": [
-	{
+	"blocks": [{
 		"type": "actions",
-		"block_id": "actions1",
-		"elements": [
-			{
-				"type": "external_select",
-				"placeholder": {
-					"type": "plain_text",
-					"text": "Which witch is the witchiest witch?"
-				},
-				"action_id": "select_2"
-			}
-		]
+		"elements": [{
+			"type": "external_select",
+			"action_id": "subprocess",
+			"placeholder": {
+				"type": "plain_text",
+				"text": "Subprocess"
+			},
+			"min_query_length": 4
+		}]
 	}]
 }]

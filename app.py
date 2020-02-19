@@ -1,22 +1,26 @@
-#!/usr/local/bin/python3
-
+#!/usr/bin/python3
+import importlib
 from flask import Flask, request, make_response, Response
 import os
 import json
-from slackclient import SlackClient
+import ssl
+from slack import WebClient
+import calendar_api
 
 SLACK_BOT_TOKEN = os.environ["SLACK_BOT_TOKEN"]
 SLACK_VERIFICATION_TOKEN = os.environ["SLACK_VERIFICATION_TOKEN"]
 
-# Slack client for Web API requests
-slack_client = SlackClient(SLACK_BOT_TOKEN)
+ssl_context = ssl.create_default_context()
+ssl_context.check_hostname = False
+ssl_context.verify_mode = ssl.CERT_NONE
+slack_client=WebClient(token=SLACK_BOT_TOKEN,ssl=ssl_context)
 
 # Flask webserver for incoming traffic from Slack
 app = Flask(__name__)
 
 def json_pretty(json_block):
     json_formatted_str = json.dumps(json_block, indent=2)
-    return json_formatted_str
+    print(json_formatted_str)
 
 # def get_user_calendar_events():
 
@@ -35,15 +39,14 @@ def get_user_list():
 
             print(json_pretty(intro_msg))
 
-            response = slack_client.api_call(
-              "chat.postMessage",
+            response = slack_client.chat_postMessage(
               channel=item["id"],
               attachments=intro_msg
             )
 
             print("Message delivered:" + " " + str(response["ok"]))
 
-            print(json_pretty(response))
+            print(response)
 
 # Helper for verifying that requests came from Slack
 def verify_slack_token(request_token):
@@ -51,46 +54,6 @@ def verify_slack_token(request_token):
         print("Error: invalid verification token!")
         print("Received {} but was expecting {}".format(request_token, SLACK_VERIFICATION_TOKEN))
         return make_response("Request contains invalid Slack verification token", 403)
-
-@app.route("/slack/options", methods=["POST"])
-def message_options():
-    # Parse the request payload
-    form_json = json.loads(request.form["payload"])
-
-    print(json_pretty(form_json))
-
-    # Verify that the request came from Slack
-    verify_slack_token(form_json["token"])
-
-    # Dictionary of menu options which will be sent as JSON
-    menu_options = {
-      "options": [
-                    {
-                        "text": {
-                            "type": "plain_text",
-                            "text": "Choice 1"
-                        },
-                        "value": "value-0"
-                    },
-                    {
-                        "text": {
-                            "type": "plain_text",
-                            "text": "Choice 2"
-                        },
-                        "value": "value-1"
-                    },
-                    {
-                        "text": {
-                            "type": "plain_text",
-                            "text": "Choice 3"
-                        },
-                        "value": "value-2"
-                    }
-                ]
-    }
-
-    # Load options dict as JSON and respond to Slack
-    return Response(json.dumps(menu_options), mimetype='application/json')
 
 # # The endpoint Slack will send the user's menu selection to
 @app.route("/slack/message_actions", methods=["POST"])
@@ -126,7 +89,16 @@ def message_actions():
     # Send an HTTP 200 response with empty body so Slack knows we're done here
     return make_response("", 200)
 
-get_user_list()
 
-if __name__ == "__main__":
-    app.run()
+INTERVIEW_AVAIL_CAL = 'ashok.gadepalli@contino.io'
+
+service = calendar_api.get_service()
+events = calendar_api.get_events_for_next_week(service,calendar_api.next_weekday(0),calendar_api.next_weekday(5),INTERVIEW_AVAIL_CAL)
+slots = calendar_api.get_free_slots_for_week(service,INTERVIEW_AVAIL_CAL,events,calendar_api.next_weekday(0),calendar_api.next_weekday(5))
+
+json_pretty(slots)
+
+# importlib.import_module(calendar_api)
+
+# if __name__ == "__main__":
+#     app.run()
