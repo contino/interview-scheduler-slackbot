@@ -89,6 +89,7 @@ def get_free_slots_for_week(service,calendar,events,next_weekday,last_weekday):
         appointments = []
 
         if current_day_busy_events:
+
             for busy_event in current_day_busy_events:
 
                 busy_event_start = (dateutil.parser.parse(busy_event["start"]))
@@ -97,8 +98,9 @@ def get_free_slots_for_week(service,calendar,events,next_weekday,last_weekday):
 
         slots_for_day = get_free_slots_for_day(hours, appointments, duration, current_day.date(), calendar_timezone)
 
-        for slot in slots_for_day:
-            slots_for_week.append(slot)
+        # for slot in slots_for_day:
+
+        slots_for_week.append(slots_for_day)
 
         current_day += datetime.timedelta(days=1)
 
@@ -118,6 +120,7 @@ def get_free_slots_for_day(hours, appointments, duration, date, timezone):
             event = {}
 
             slot['date'] = str(date)
+            slot['weekday'] = date.strftime('%A')
             slot['timezone'] = timezone
 
             event['start'] = start.isoformat()
@@ -161,16 +164,13 @@ def json_pretty(json_block):
     print(json_formatted_str)
 
 def next_weekday(weekday):
-    
     today = datetime.datetime.today()
-
     days_ahead = weekday - today.weekday()
-
     days_ahead += 7
-
     next_weekday = today + datetime.timedelta(days_ahead)
-    
     return datetime.datetime.combine(next_weekday.date(), datetime.time(0,0,0,0))
+
+# def get_workingdays():
 
 if __name__ == '__main__':
     main()

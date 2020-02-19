@@ -1,14 +1,26 @@
 [{
-	"blocks": [{
-		"type": "actions",
-		"elements": [{
-			"type": "external_select",
-			"action_id": "subprocess",
-			"placeholder": {
-				"type": "plain_text",
-				"text": "Subprocess"
+	"blocks": [
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "Hello Contini! I checked your Interview availability calendar for next week and it looks like you have not scheduled a slot. I already checked your calendar for next week and have them ready in the drop-downs below. You can choose one from each day!"
+			}
+		},
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "Pick an item from the dropdown list"
 			},
-			"min_query_length": 4
-		}]
-	}]
+			"accessory": {
+				"type": "external_select",
+				"placeholder": {
+					"type": "plain_text",
+					"text": "Select a slot for "
+				},
+				"min_query_length": 0
+			}
+		}
+	]
 }]

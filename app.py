@@ -9,10 +9,12 @@ import calendar_api
 
 SLACK_BOT_TOKEN = os.environ["SLACK_BOT_TOKEN"]
 SLACK_VERIFICATION_TOKEN = os.environ["SLACK_VERIFICATION_TOKEN"]
+INTERVIEW_AVAIL_CAL = 'ashok.gadepalli@contino.io'
 
 ssl_context = ssl.create_default_context()
 ssl_context.check_hostname = False
 ssl_context.verify_mode = ssl.CERT_NONE
+
 slack_client=WebClient(token=SLACK_BOT_TOKEN,ssl=ssl_context)
 
 # Flask webserver for incoming traffic from Slack
@@ -22,12 +24,7 @@ def json_pretty(json_block):
     json_formatted_str = json.dumps(json_block, indent=2)
     print(json_formatted_str)
 
-# def get_user_calendar_events():
-
 def get_user_list():
-
-    with open('botkit_message.json') as msg_file:
-        intro_msg = json.load(msg_file)
 
     payload = slack_client.api_call("users.list")
     # print json_pretty(payload)
@@ -37,16 +34,65 @@ def get_user_list():
 
             # print(item["id"] + " " + item["profile"]["real_name_normalized"] + " " + item["profile"]["email"])
 
-            print(json_pretty(intro_msg))
-
-            response = slack_client.chat_postMessage(
-              channel=item["id"],
-              attachments=intro_msg
-            )
+            response = post_message(item["id"])
 
             print("Message delivered:" + " " + str(response["ok"]))
 
-            print(response)
+
+def post_message(channel_id):
+
+    blocks = []
+
+    welcome_block = {
+        "type": "section",
+        "text": {
+            "type": "mrkdwn",
+            "text": "Hello Contini! I checked your Interview availability calendar for next week and it looks like you have not scheduled a slot. I already checked your calendar for next week and have them ready in the drop-downs below. You can choose one from each day!"
+        }
+    }
+
+    blocks.append(welcome_block)
+
+    service = calendar_api.get_service()
+    events = calendar_api.get_events_for_next_week(service,calendar_api.next_weekday(0),calendar_api.next_weekday(5),INTERVIEW_AVAIL_CAL)
+    slots = calendar_api.get_free_slots_for_week(service,INTERVIEW_AVAIL_CAL,events,calendar_api.next_weekday(0),calendar_api.next_weekday(5))
+
+    #replace above functions with function to get working days for next week
+
+    accessory_sections = []
+
+    for day in slots: #each day's events are encased in their own array
+
+        weekday = day[0]["weekday"]
+        event_date = day[0]["date"]
+
+        drop_down = {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "Pick a slot for " + weekday + " " + event_date
+            },
+            "accessory": {
+                "type": "external_select",
+                "action_id": channel_id + "_" + weekday + "_" + event_date,
+                "placeholder": {
+                    "type": "plain_text",
+                    "text": "Pick a slot"
+                },
+                "min_query_length": 0
+            }
+        }
+
+        blocks.append(drop_down)
+
+    initial_message = [{ "blocks": blocks }]
+
+    response = slack_client.chat_postMessage(
+      channel=channel_id,
+      attachments=json.dumps(initial_message)
+    )
+
+    return response
 
 # Helper for verifying that requests came from Slack
 def verify_slack_token(request_token):
@@ -69,14 +115,9 @@ def message_actions():
     verify_slack_token(form_json["token"])
 
     # Check to see what the user's selection was and update the message accordingly
-    selection = form_json["actions"][0]["value"]
+    selection = form_json["actions"][0]["selected_option"]["value"]
 
     print(selection)
-
-    # if selection == "cappuccino":
-    #     message_text = "cappuccino"
-    # else:
-    #     message_text = "latte"
 
     # response = slack_client.api_call(
     #   "chat.update",
@@ -89,16 +130,43 @@ def message_actions():
     # Send an HTTP 200 response with empty body so Slack knows we're done here
     return make_response("", 200)
 
+@app.route("/slack/options", methods=["POST"])
+def message_options():
 
-INTERVIEW_AVAIL_CAL = 'ashok.gadepalli@contino.io'
+    form_json = json.loads(request.form["payload"])
 
-service = calendar_api.get_service()
-events = calendar_api.get_events_for_next_week(service,calendar_api.next_weekday(0),calendar_api.next_weekday(5),INTERVIEW_AVAIL_CAL)
-slots = calendar_api.get_free_slots_for_week(service,INTERVIEW_AVAIL_CAL,events,calendar_api.next_weekday(0),calendar_api.next_weekday(5))
 
-json_pretty(slots)
+    verify_slack_token(form_json["token"])
 
-# importlib.import_module(calendar_api)
+    menu_options = {
+          "options": [
+            {
+              "text": {
+                "type": "plain_text",
+                "text": "10am to 11am"
+              },
+              "value": "10to11"
+            },
+            {
+              "text": {
+                "type": "plain_text",
+                "text": "11am to 12pm"
+              },
+              "value": "11to12"
+            },
+            {
+              "text": {
+                "type": "plain_text",
+                "text": "1pm to 2pm"
+              },
+              "value": "1to2"
+            }
+          ]
+    }
 
-# if __name__ == "__main__":
-#     app.run()
+    return Response(json.dumps(menu_options), mimetype='application/json')
+
+get_user_list()
+
+if __name__ == "__main__":
+    app.run()
