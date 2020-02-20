@@ -6,6 +6,7 @@ import json
 import ssl
 from slack import WebClient
 import calendar_api
+import dateutil.parser
 
 SLACK_BOT_TOKEN = os.environ["SLACK_BOT_TOKEN"]
 SLACK_VERIFICATION_TOKEN = os.environ["SLACK_VERIFICATION_TOKEN"]
@@ -51,6 +52,8 @@ def get_user_list():
             
             print("Message delivered:" + " " + str(response["ok"]))
 
+
+
 def post_message(service,channel_id,user_email):
 
     blocks = []
@@ -59,7 +62,7 @@ def post_message(service,channel_id,user_email):
         "type": "section",
         "text": {
             "type": "mrkdwn",
-            "text": "Hello Contini! I checked your Interview availability calendar for next week and it looks like you have not scheduled a slot. I already checked your calendar for next week and have them ready in the drop-downs below. You can choose one from each day!"
+            "text": "Hello Contini! I checked your Interview availability calendar for next week and it looks like you have not scheduled a slot. I checked your calendar and have some options below, pick one and I will set it up for you on the interview availability calendar."
         }
     }
 
@@ -71,24 +74,14 @@ def post_message(service,channel_id,user_email):
 
         options = []
         
-        # {
-        #   "date": "2020-02-27",
-        #   "weekday": "Thursday",
-        #   "timezone": "America/New_York",
-        #   "event": {
-        #     "start": "2020-02-27T12:30:00-05:00",
-        #     "end": "2020-02-27T13:30:00-05:00"
-        #   }
-        # }
-
         for free_slot in day:
 
             option = {
                 "text": {
                     "type": "plain_text",
-                    "text": free_slot["event"]["start"]
+                    "text": free_slot["event"]["start"] + " - " + free_slot["event"]["end"]
                 },
-                "value": free_slot["event"]["start"]
+                "value": free_slot["event"]["isostart"]
             }
 
             options.append(option)
@@ -97,13 +90,14 @@ def post_message(service,channel_id,user_email):
             "type": "section",
             "text": {
                 "type": "mrkdwn",
-                "text": "Pick a slot for " + day["weekday"] + " " + day["date"]
+                "text": "Pick a slot for " + day[0]["weekday"] + " " + day[0]["date"]
             },
             "accessory": {
                 "type": "static_select",
+                "action_id": user_email + "_" + channel_id,
                 "placeholder": {
                     "type": "plain_text",
-                    "text": "Select an item"
+                    "text": "Select a slot"
                 },
                 "options": options
             }
@@ -131,28 +125,16 @@ def verify_slack_token(request_token):
 @app.route("/slack/message_actions", methods=["POST"])
 def message_actions():
 
-    # Parse the request payload
     form_json = json.loads(request.form["payload"])
-
-    json_formatted_str = json.dumps(form_json, indent=2)
-    print(json_formatted_str)
-
-    # Verify that the request came from Slack
     verify_slack_token(form_json["token"])
 
-    # Check to see what the user's selection was and update the message accordingly
-    selection = form_json["actions"][0]["selected_option"]["value"]
+    
+    json_pretty(form_json)
 
+
+    selection = form_json["actions"][0]["selected_option"]["value"]
     print(selection)
 
-    # response = slack_client.chat_update(
-    #   channel=form_json["channel"]["id"],
-    #   ts=form_json["message"]["ts"],
-    #   text="Update aww yiss",
-    #   attachments=[] # empty `attachments` to clear the existing massage attachments
-    # )
-
-    # Send an HTTP 200 response with empty body so Slack knows we're done here
     return make_response("", 200)
 
 # @app.route("/slack/options", methods=["POST"])

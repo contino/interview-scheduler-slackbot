@@ -1,5 +1,9 @@
 # interview-scheduler-slackbot
 
+## What does this bot do?
+
+Makes scheduling interview slots for the coming week super easy. Pull out your phone, look at the client calendar and pick a slot, the bot will create the event on the Interview Availability calendar 🤯. The bot will make sure the suggested slots are from your free time.
+
 ## Setup local google calendar dev environment
 
 Follow below guide and install required tools for python dev environment
@@ -48,3 +52,30 @@ Make api call to google calendar to create event/s
 ## Sample message delivered to user
 
 ![screen capture](./images/interviewbot.png)
+
+## Sample json payload received after user clicks on option
+
+```
+  "actions": [
+    {
+      "type": "static_select",
+      "action_id": "ashok.gadepalli@contino.io_UTU6JPJG6",
+      "block_id": "=S=o",
+      "selected_option": {
+        "text": {
+          "type": "plain_text",
+          "text": "11:00:00 - 12:00:00",
+          "emoji": true
+        },
+        "value": "2020-02-24T11:00:00-06:00"
+      },
+      "placeholder": {
+        "type": "plain_text",
+        "text": "Select a slot",
+        "emoji": true
+      },
+      "action_ts": "1582174391.004828"
+    }
+  ]
+}
+```

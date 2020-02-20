@@ -127,8 +127,9 @@ def get_free_slots_for_day(hours, appointments, duration, date, timezone):
             slot['weekday'] = date.strftime('%A')
             slot['timezone'] = timezone
 
-            event['start'] = start.isoformat()
-            event['end'] = (start + duration).isoformat()
+            event['start'] = start.strftime("%H:%M:%S")
+            event['end'] = (start + duration).strftime("%H:%M:%S")
+            event['isostart'] = start.isoformat()
             
             slot['event'] = event
 
