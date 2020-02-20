@@ -43,7 +43,7 @@ def get_events_for_next_week(service,next_weekday,last_weekday,calendar):
 
     events_result = service.events().list(  calendarId=calendar,
                                             timeMin=next_weekday.isoformat() + 'Z',
-                                            timeMax=last_weekday.isoformat() + 'Z', 
+                                            timeMax=last_weekday.isoformat() + 'Z',
                                             singleEvents=True,
                                             orderBy='startTime').execute()
 
@@ -51,7 +51,7 @@ def get_events_for_next_week(service,next_weekday,last_weekday,calendar):
 
     return events
 
-def get_free_slots_for_week(service,calendar,events,next_weekday,last_weekday):
+def get_free_slots_for_week(service,calendar,next_weekday,last_weekday):
 
     calendar_timezone = get_calendar_tz(service,calendar)
 
@@ -70,6 +70,8 @@ def get_free_slots_for_week(service,calendar,events,next_weekday,last_weekday):
 
         next_day = current_day + datetime.timedelta(days=1)
         
+####
+
         body = {
             "timeMin": current_day.isoformat(),
             "timeMax": next_day.isoformat(),
@@ -78,6 +80,8 @@ def get_free_slots_for_week(service,calendar,events,next_weekday,last_weekday):
         }
         
         eventsResult = service.freebusy().query(body=body).execute()
+        
+####
 
         current_day_busy_events = eventsResult["calendars"][calendar]["busy"]
 
@@ -158,6 +162,8 @@ def get_calendars_list(service):
         # print(calid, calendar['summary'])
         get_calendar_tz(service,calendar['id'])
         # print(json_pretty(calendar))
+
+# def get_working_days_for_next_week(holiday_calendar):
 
 def json_pretty(json_block):
     json_formatted_str = json.dumps(json_block, indent=2)

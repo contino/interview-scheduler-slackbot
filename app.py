@@ -9,13 +9,17 @@ import calendar_api
 
 SLACK_BOT_TOKEN = os.environ["SLACK_BOT_TOKEN"]
 SLACK_VERIFICATION_TOKEN = os.environ["SLACK_VERIFICATION_TOKEN"]
-INTERVIEW_AVAIL_CAL = 'ashok.gadepalli@contino.io'
+
+DEMO_USER_CAL = 'ashok.gadepalli@contino.io'
+INTERVIEW_AVAIL_CAL = 'contino.io_eepahmdv2bb1tvhbvv0ictha3g@group.calendar.google.com'
 
 ssl_context = ssl.create_default_context()
 ssl_context.check_hostname = False
 ssl_context.verify_mode = ssl.CERT_NONE
 
 slack_client=WebClient(token=SLACK_BOT_TOKEN,ssl=ssl_context)
+
+
 
 # Flask webserver for incoming traffic from Slack
 app = Flask(__name__)
@@ -26,20 +30,28 @@ def json_pretty(json_block):
 
 def get_user_list():
 
+    service = calendar_api.get_service()
+
+    interview_calendar_events = calendar_api.get_events_for_next_week(service,calendar_api.next_weekday(0),calendar_api.next_weekday(5),INTERVIEW_AVAIL_CAL)
+    weekdays = calendar_api.get_free_slots_for_week(service,INTERVIEW_AVAIL_CAL,calendar_api.next_weekday(0),calendar_api.next_weekday(5))
+
+    already_signed_up_users = []
+
+    for event in interview_calendar_events:
+        already_signed_up_users.append(event["creator"]["email"])
+
     payload = slack_client.api_call("users.list")
-    # print json_pretty(payload)
 
     for item in payload["members"]:
-        if "email" in item["profile"]:
+        if "email" in item["profile"] and item["profile"]["email"] not in already_signed_up_users:
 
-            # print(item["id"] + " " + item["profile"]["real_name_normalized"] + " " + item["profile"]["email"])
+            print(item["id"] + " " + item["profile"]["real_name_normalized"] + " " + item["profile"]["email"])
 
-            response = post_message(item["id"])
-
+            response = post_message(service,item["id"],DEMO_USER_CAL) #testing only use above line for prod
+            
             print("Message delivered:" + " " + str(response["ok"]))
 
-
-def post_message(channel_id):
+def post_message(service,channel_id,user_email):
 
     blocks = []
 
@@ -53,33 +65,47 @@ def post_message(channel_id):
 
     blocks.append(welcome_block)
 
-    service = calendar_api.get_service()
-    events = calendar_api.get_events_for_next_week(service,calendar_api.next_weekday(0),calendar_api.next_weekday(5),INTERVIEW_AVAIL_CAL)
-    slots = calendar_api.get_free_slots_for_week(service,INTERVIEW_AVAIL_CAL,events,calendar_api.next_weekday(0),calendar_api.next_weekday(5))
+    weekdays = calendar_api.get_free_slots_for_week(service,user_email,calendar_api.next_weekday(0),calendar_api.next_weekday(5))
 
-    #replace above functions with function to get working days for next week
+    for day in weekdays: #each day's events are encased in their own array
 
-    accessory_sections = []
+        options = []
+        
+        # {
+        #   "date": "2020-02-27",
+        #   "weekday": "Thursday",
+        #   "timezone": "America/New_York",
+        #   "event": {
+        #     "start": "2020-02-27T12:30:00-05:00",
+        #     "end": "2020-02-27T13:30:00-05:00"
+        #   }
+        # }
 
-    for day in slots: #each day's events are encased in their own array
+        for free_slot in day:
 
-        weekday = day[0]["weekday"]
-        event_date = day[0]["date"]
+            option = {
+                "text": {
+                    "type": "plain_text",
+                    "text": free_slot["event"]["start"]
+                },
+                "value": free_slot["event"]["start"]
+            }
+
+            options.append(option)
 
         drop_down = {
             "type": "section",
             "text": {
                 "type": "mrkdwn",
-                "text": "Pick a slot for " + weekday + " " + event_date
+                "text": "Pick a slot for " + day["weekday"] + " " + day["date"]
             },
             "accessory": {
-                "type": "external_select",
-                "action_id": channel_id + "_" + weekday + "_" + event_date,
+                "type": "static_select",
                 "placeholder": {
                     "type": "plain_text",
-                    "text": "Pick a slot"
+                    "text": "Select an item"
                 },
-                "min_query_length": 0
+                "options": options
             }
         }
 
@@ -119,52 +145,64 @@ def message_actions():
 
     print(selection)
 
-    # response = slack_client.api_call(
-    #   "chat.update",
+    # response = slack_client.chat_update(
     #   channel=form_json["channel"]["id"],
-    #   ts=form_json["message_ts"],
-    #   text="One {}, right coming up! :coffee:".format(message_text),
+    #   ts=form_json["message"]["ts"],
+    #   text="Update aww yiss",
     #   attachments=[] # empty `attachments` to clear the existing massage attachments
     # )
 
     # Send an HTTP 200 response with empty body so Slack knows we're done here
     return make_response("", 200)
 
-@app.route("/slack/options", methods=["POST"])
-def message_options():
+# @app.route("/slack/options", methods=["POST"])
+# def message_options():
 
-    form_json = json.loads(request.form["payload"])
+#     form_json = json.loads(request.form["payload"])
 
+#     # json_pretty(form_json)
+#     # user_id = form_json["user"]["username"]
 
-    verify_slack_token(form_json["token"])
+#     action_id = form_json["action_id"]
 
-    menu_options = {
-          "options": [
-            {
-              "text": {
-                "type": "plain_text",
-                "text": "10am to 11am"
-              },
-              "value": "10to11"
-            },
-            {
-              "text": {
-                "type": "plain_text",
-                "text": "11am to 12pm"
-              },
-              "value": "11to12"
-            },
-            {
-              "text": {
-                "type": "plain_text",
-                "text": "1pm to 2pm"
-              },
-              "value": "1to2"
-            }
-          ]
-    }
+#     print(form_json["action_id"])
 
-    return Response(json.dumps(menu_options), mimetype='application/json')
+#     user_data = form_json["action_id"].split("_")
+
+#     # print(user_data[0])
+
+#     # free_slots = calendar_api.get_free_slots_for_week(service,user_data[0],calendar_api.next_weekday(0),calendar_api.next_weekday(5))
+#     # json_pretty(free_slots)
+
+#     verify_slack_token(form_json["token"])
+
+#     menu_options = {
+#           "options": [
+#             {
+#               "text": {
+#                 "type": "plain_text",
+#                 "text": "10am to 11am"
+#               },
+#               "value": "10to11"
+#             },
+#             {
+#               "text": {
+#                 "type": "plain_text",
+#                 "text": "11am to 12pm"
+#               },
+#               "value": "11to12"
+#             },
+#             {
+#               "text": {
+#                 "type": "plain_text",
+#                 "text": "1pm to 2pm"
+#               },
+#               "value": "1to2"
+#             }
+#           ]
+#     }
+
+#     return Response(json.dumps(menu_options), mimetype='application/json')
 
 get_user_list()
 
