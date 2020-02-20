@@ -39,11 +39,11 @@ Get Busy events from user's calendar on specific day ✅
 
 Identify free slots in their calendar that span 1 hour from above day (avoid lunch time) ✅
 
-Use slots fetched to build message for individual user 👩‍💻
+Use slots fetched to build message for individual user ✅
 
-Deliver payload to user's direct message channel
+Deliver payload to user's direct message channel ✅
 
-Capture user response json (button click)
+Capture user response json (button click) 👩‍💻
 
 Build payload for google calendar
 
