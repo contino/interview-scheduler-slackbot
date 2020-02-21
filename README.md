@@ -44,11 +44,15 @@ Use slots fetched to build message for individual user ✅
 
 Deliver payload to user's direct message channel ✅
 
-Capture user response json (button click) 👩‍💻
+Capture user response json (button click) ✅
 
-Build payload for google calendar
+Build payload for google calendar ✅
 
-Make api call to google calendar to create event/s
+Make api call to google calendar to create event/s ✅
+
+Deploy to AWS Lambda 👩‍💻
+
+Test bot with users from several timezones 
 
 ## Sample message delivered to user
 

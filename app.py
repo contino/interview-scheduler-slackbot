@@ -20,14 +20,8 @@ ssl_context.verify_mode = ssl.CERT_NONE
 
 slack_client=WebClient(token=SLACK_BOT_TOKEN,ssl=ssl_context)
 
-
-
 # Flask webserver for incoming traffic from Slack
 app = Flask(__name__)
-
-def json_pretty(json_block):
-    json_formatted_str = json.dumps(json_block, indent=2)
-    print(json_formatted_str)
 
 def get_user_list():
 
@@ -48,13 +42,10 @@ def get_user_list():
 
             print(item["id"] + " " + item["profile"]["real_name_normalized"] + " " + item["profile"]["email"])
 
-            response = post_message(service,item["id"],DEMO_USER_CAL) #testing only use above line for prod
-            
+            response = post_message(service,item["id"],DEMO_USER_CAL,item["profile"]["real_name_normalized"].replace(" ", "%")) #testing only use above line for prod
             print("Message delivered:" + " " + str(response["ok"]))
 
-
-
-def post_message(service,channel_id,user_email):
+def post_message(service,channel_id,user_email,user_real_name):
 
     blocks = []
 
@@ -81,7 +72,7 @@ def post_message(service,channel_id,user_email):
                     "type": "plain_text",
                     "text": free_slot["event"]["start"] + " - " + free_slot["event"]["end"]
                 },
-                "value": free_slot["event"]["isostart"]
+                "value": free_slot["event"]["isostart"] + "_" + free_slot["event"]["isoend"]
             }
 
             options.append(option)
@@ -94,7 +85,7 @@ def post_message(service,channel_id,user_email):
             },
             "accessory": {
                 "type": "static_select",
-                "action_id": user_email + "_" + channel_id,
+                "action_id": user_email + "_" + day[0]["timezone"] + "_" + user_real_name,
                 "placeholder": {
                     "type": "plain_text",
                     "text": "Select a slot"
@@ -126,65 +117,33 @@ def verify_slack_token(request_token):
 def message_actions():
 
     form_json = json.loads(request.form["payload"])
+
     verify_slack_token(form_json["token"])
 
-    
-    json_pretty(form_json)
+    event_start = form_json["actions"][0]["selected_option"]["value"].split("_")[0]
+    event_end = form_json["actions"][0]["selected_option"]["value"].split("_")[1]
 
+    user_email = form_json["actions"][0]["action_id"].split("_")[0]
+    user_tz = form_json["actions"][0]["action_id"].split("_")[1]
+    user_real_name = form_json["actions"][0]["action_id"].split("_")[2].replace("%", " ")
 
-    selection = form_json["actions"][0]["selected_option"]["value"]
-    print(selection)
+    insert_response = calendar_api.create_event(calendar_api.get_service(),INTERVIEW_AVAIL_CAL,user_email,user_tz,event_start,event_end,user_real_name)
+
+    json_pretty(insert_response)
+
+    if insert_response["status"] == 'confirmed':
+        response = slack_client.chat_postMessage(
+            channel=form_json["channel"]["id"],
+            thread_ts=form_json["message"]["ts"],
+            text=form_json["actions"][0]["selected_option"]["value"].split("T")[0] + "\t" 
+            + form_json["actions"][0]["selected_option"]["text"]["text"] + " scheduled ✅"
+        )
 
     return make_response("", 200)
 
-# @app.route("/slack/options", methods=["POST"])
-# def message_options():
-
-#     form_json = json.loads(request.form["payload"])
-
-#     # json_pretty(form_json)
-#     # user_id = form_json["user"]["username"]
-
-#     action_id = form_json["action_id"]
-
-#     print(form_json["action_id"])
-
-#     user_data = form_json["action_id"].split("_")
-
-#     # print(user_data[0])
-
-#     # free_slots = calendar_api.get_free_slots_for_week(service,user_data[0],calendar_api.next_weekday(0),calendar_api.next_weekday(5))
-#     # json_pretty(free_slots)
-
-#     verify_slack_token(form_json["token"])
-
-#     menu_options = {
-#           "options": [
-#             {
-#               "text": {
-#                 "type": "plain_text",
-#                 "text": "10am to 11am"
-#               },
-#               "value": "10to11"
-#             },
-#             {
-#               "text": {
-#                 "type": "plain_text",
-#                 "text": "11am to 12pm"
-#               },
-#               "value": "11to12"
-#             },
-#             {
-#               "text": {
-#                 "type": "plain_text",
-#                 "text": "1pm to 2pm"
-#               },
-#               "value": "1to2"
-#             }
-#           ]
-#     }
-
-#     return Response(json.dumps(menu_options), mimetype='application/json')
+def json_pretty(json_block):
+    json_formatted_str = json.dumps(json_block, indent=2)
+    print(json_formatted_str)
 
 get_user_list()
 
