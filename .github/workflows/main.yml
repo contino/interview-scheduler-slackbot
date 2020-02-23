@@ -26,9 +26,9 @@ jobs:
     - name: NPM or Yarn install with caching
       uses: bahmutov/npm-install@v1.1.0
     - name: Extract branch name
-        shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-        id: extract_branch
+      shell: bash
+      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+      id: extract_branch
     - name: serverless deploy
       uses: vlaaaaaaad/github-action@python-too
       with:
