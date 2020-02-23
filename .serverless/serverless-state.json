@@ -9,7 +9,7 @@
       "region": "us-east-1",
       "variableSyntax": "\\${([ ~:a-zA-Z0-9._'\",\\-\\/\\(\\)]+?)}",
       "name": "aws",
-      "runtime": "python3.6",
+      "runtime": "python3.7",
       "versionFunctions": true,
       "remoteFunctionData": null,
       "compiledCloudFormationTemplate": {
@@ -106,7 +106,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/serverless-flask/dev/1582420457606-2020-02-23T01:14:17.606Z/serverless-flask.zip"
+                "S3Key": "serverless/serverless-flask/dev/1582492200248-2020-02-23T21:10:00.248Z/serverless-flask.zip"
               },
               "FunctionName": "serverless-flask-dev-app",
               "Handler": "wsgi_handler.handler",
@@ -117,7 +117,7 @@
                   "Arn"
                 ]
               },
-              "Runtime": "python3.6",
+              "Runtime": "python3.7",
               "Timeout": 6
             },
             "DependsOn": [
@@ -125,14 +125,14 @@
               "IamRoleLambdaExecution"
             ]
           },
-          "AppLambdaVersion6BG5jMZkT0bkVa1YDepoWqCIqBzgPJxxjZW6GUOIP74": {
+          "AppLambdaVersion7Ji2WYJd9CD87cDBgBDlBldRTI2vVs7jHb3usDEfE5g": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "AppLambdaFunction"
               },
-              "CodeSha256": "/7OSveoIYUVInKiOc7piLSsn3gLepo4jVm6BEWt3ZHc="
+              "CodeSha256": "lyHyir63zDYup4Haz+i2NBM5DMTb6kdcN+qXhuNDrtY="
             }
           },
           "ApiGatewayRestApi": {
@@ -250,7 +250,7 @@
               "MethodResponses": []
             }
           },
-          "ApiGatewayDeployment1582420457663": {
+          "ApiGatewayDeployment1582492200308": {
             "Type": "AWS::ApiGateway::Deployment",
             "Properties": {
               "RestApiId": {
@@ -320,7 +320,7 @@
           "AppLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "AppLambdaVersion6BG5jMZkT0bkVa1YDepoWqCIqBzgPJxxjZW6GUOIP74"
+              "Ref": "AppLambdaVersion7Ji2WYJd9CD87cDBgBDlBldRTI2vVs7jHb3usDEfE5g"
             }
           },
           "ServiceEndpoint": {
@@ -391,14 +391,14 @@
         "package": {},
         "memory": 1024,
         "timeout": 6,
-        "runtime": "python3.6",
+        "runtime": "python3.7",
         "vpc": {}
       }
     },
     "artifact": "/Users/ashokgadepalli/interview-scheduler-slackbot/.serverless/serverless-flask.zip"
   },
   "package": {
-    "artifactDirectoryName": "serverless/serverless-flask/dev/1582420457606-2020-02-23T01:14:17.606Z",
+    "artifactDirectoryName": "serverless/serverless-flask/dev/1582492200248-2020-02-23T21:10:00.248Z",
     "artifact": "serverless-flask.zip"
   }
 }
