@@ -25,6 +25,10 @@ jobs:
         aws-region: us-east-2
     - name: NPM or Yarn install with caching
       uses: bahmutov/npm-install@v1.1.0
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.7
     - name: serverless deploy
       uses: serverless/github-action@master
       with:
