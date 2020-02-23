@@ -30,7 +30,7 @@ jobs:
       with:
         python-version: 3.7
     - name: serverless deploy
-      uses: serverless/github-action@master
+      uses: vlaaaaaaad/github-action@python-too
       with:
         args: deploy
       env:
