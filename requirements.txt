@@ -4,3 +4,6 @@ Flask>=1.1.1
 certifi
 google-api-python-client==1.6.2
 websocket-client==0.47.0
+pytz
+google-auth-httplib2
+google-auth-oauthlib

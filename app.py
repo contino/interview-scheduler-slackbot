@@ -39,9 +39,7 @@ def get_user_list():
 
     for item in payload["members"]:
         if "email" in item["profile"] and item["profile"]["email"] not in already_signed_up_users:
-
             print(item["id"] + " " + item["profile"]["real_name_normalized"] + " " + item["profile"]["email"])
-
             response = post_message(service,item["id"],DEMO_USER_CAL,item["profile"]["real_name_normalized"].replace(" ", "%")) #testing only use above line for prod
             print("Message delivered:" + " " + str(response["ok"]))
 
@@ -81,7 +79,7 @@ def post_message(service,channel_id,user_email,user_real_name):
             "type": "section",
             "text": {
                 "type": "mrkdwn",
-                "text": "Pick a slot for " + day[0]["weekday"] + " " + day[0]["date"]
+                "text": day[0]["weekday"] + "\t" + day[0]["date"] + "\t" + day[0]["timezone"]
             },
             "accessory": {
                 "type": "static_select",
