@@ -23,10 +23,8 @@ jobs:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-2
-    - name: npm install
-      uses: actions/npm@master
-      with:
-        args: install
+    - name: NPM or Yarn install with caching
+      uses: bahmutov/npm-install@v1.1.0
     - name: serverless deploy
       uses: serverless/github-action@master
       with:
