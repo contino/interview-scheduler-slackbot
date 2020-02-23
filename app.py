@@ -10,9 +10,9 @@ import dateutil.parser
 
 SLACK_BOT_TOKEN = os.environ["SLACK_BOT_TOKEN"]
 SLACK_VERIFICATION_TOKEN = os.environ["SLACK_VERIFICATION_TOKEN"]
+INTERVIEW_AVAIL_CAL = os.environ["INTERVIEW_AVAIL_CAL"]
 
 DEMO_USER_CAL = 'ashok.gadepalli@contino.io'
-INTERVIEW_AVAIL_CAL = 'contino.io_eepahmdv2bb1tvhbvv0ictha3g@group.calendar.google.com'
 
 ssl_context = ssl.create_default_context()
 ssl_context.check_hostname = False
@@ -47,6 +47,55 @@ def get_user_list():
     response = post_message('#random',DEMO_USER_CAL,'test')
 
 def post_message(channel_id,user_email,user_real_name):
+
+    # blocks = []
+
+    # welcome_block = {
+    #     "type": "section",
+    #     "text": {
+    #         "type": "mrkdwn",
+    #         "text": "Hello Contini! I checked your Interview availability calendar for next week and it looks like you have not scheduled a slot. I checked your calendar and have some options below, pick one and I will set it up for you on the interview availability calendar."
+    #     }
+    # }
+
+    # blocks.append(welcome_block)
+
+    # weekdays = calendar_api.get_free_slots_for_week(service,user_email,calendar_api.next_weekday(0),calendar_api.next_weekday(5))
+
+    # for day in weekdays: #each day's events are encased in their own array
+
+    #     options = []
+        
+    #     for free_slot in day:
+
+    #         option = {
+    #             "text": {
+    #                 "type": "plain_text",
+    #                 "text": free_slot["event"]["start"] + " - " + free_slot["event"]["end"]
+    #             },
+    #             "value": free_slot["event"]["isostart"] + "_" + free_slot["event"]["isoend"]
+    #         }
+
+    #         options.append(option)
+
+    #     drop_down = {
+    #         "type": "section",
+    #         "text": {
+    #             "type": "mrkdwn",
+    #             "text": "Pick a slot for " + day[0]["weekday"] + " " + day[0]["date"]
+    #         },
+    #         "accessory": {
+    #             "type": "static_select",
+    #             "action_id": user_email + "_" + day[0]["timezone"] + "_" + user_real_name,
+    #             "placeholder": {
+    #                 "type": "plain_text",
+    #                 "text": "Select a slot"
+    #             },
+    #             "options": options
+    #         }
+    #     }
+
+    #     blocks.append(drop_down)
 
     blocks = [
         {

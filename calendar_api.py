@@ -11,10 +11,8 @@ from google.auth.transport.requests import Request
 from google.oauth2 import service_account
 import json
 
-# If modifying these scopes, delete the file token.pickle.
 SCOPES = ['https://www.googleapis.com/auth/calendar.readonly','https://www.googleapis.com/auth/calendar.events']
-# INTERVIEW_AVAIL_CAL='contino.io_eepahmdv2bb1tvhbvv0ictha3g@group.calendar.google.com'
-INTERVIEW_AVAIL_CAL = 'ashok.gadepalli@contino.io'
+INTERVIEW_AVAIL_CAL = os.environ["INTERVIEW_AVAIL_CAL"]
 # calendar_timezone = 'America/New_York'
 
 def get_service():

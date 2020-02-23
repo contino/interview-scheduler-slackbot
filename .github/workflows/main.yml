@@ -32,3 +32,4 @@ jobs:
       env:
         SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
         SLACK_VERIFICATION_TOKEN: ${{ secrets.SLACK_VERIFICATION_TOKEN }}
+        INTERVIEW_AVAIL_CAL: ${{ secrets.INTERVIEW_AVAIL_CAL }}
