@@ -6,6 +6,7 @@ from pytz import timezone
 import pickle
 import os.path
 from googleapiclient.discovery import build
+from oauth2client.client import GoogleCredentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from google.oauth2 import service_account
@@ -13,31 +14,28 @@ import json
 
 SCOPES = ['https://www.googleapis.com/auth/calendar.readonly','https://www.googleapis.com/auth/calendar.events']
 INTERVIEW_AVAIL_CAL = os.environ["INTERVIEW_AVAIL_CAL"]
-# calendar_timezone = 'America/New_York'
 
 def get_service():
 
-    creds = None
+    service_account_creds = {
+        "type": "service_account",
+        "project_id": "deft-breaker-269101",
+        "private_key_id": os.environ["SVC_ACCOUNT_PRIV_KEY_ID"],
+        "private_key": os.environ["SVC_ACCOUNT_PRIV_KEY"].replace('\\n', '\n'),
+        "client_email": os.environ["SVC_ACCOUNT_EMAIL"],
+        "client_id": os.environ["SVC_ACCOUNT_ID"],
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "token_uri": "https://oauth2.googleapis.com/token",
+        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+        "client_x509_cert_url": os.environ["SVC_ACCOUNT_X509_CERT_URL"]
+    }
 
-    # if os.path.exists('token.pickle'):
-    #     with open('token.pickle', 'rb') as token:
-    #         creds = pickle.load(token)
+    credentials = service_account.Credentials.from_service_account_info(
+        service_account_creds, scopes=SCOPES)
 
-    # if not creds or not creds.valid:
-    #     if creds and creds.expired and creds.refresh_token:
-    #         creds.refresh(Request())
-    #     else:
-    #         flow = InstalledAppFlow.from_client_secrets_file(
-    #             'credentials.json', SCOPES)
-    #         creds = flow.run_local_server(port=0)
-    #     # Save the credentials for the next run
-    #     with open('token.pickle', 'wb') as token:
-    #         pickle.dump(creds, token)
+    delegated_credentials = credentials.with_subject('ashok.gadepalli@contino.io') #will change it Melissa's when ready
 
-    credentials = service_account.Credentials.from_service_account_file(
-        'deft-breaker-269101-72cdb9ee0c8f.json', scopes=SCOPES)
-
-    service = build('calendar', 'v3', credentials=credentials)
+    service = build('calendar', 'v3', credentials=delegated_credentials)
 
     return service
 
