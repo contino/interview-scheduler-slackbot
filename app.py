@@ -18,7 +18,7 @@ ssl_context = ssl.create_default_context()
 ssl_context.check_hostname = False
 ssl_context.verify_mode = ssl.CERT_NONE
 
-slack_client=WebClient(token = SLACK_BOT_TOKEN,ssl = ssl_context)
+slack_client = WebClient(token = SLACK_BOT_TOKEN,ssl = ssl_context)
 
 app = Flask(__name__)
 
