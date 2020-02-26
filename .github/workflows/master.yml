@@ -1,4 +1,4 @@
-name: Slackbot-pipeline
+name: master-workflow
 
 on:
  push:
