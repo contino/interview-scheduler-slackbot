@@ -18,7 +18,7 @@ ssl_context = ssl.create_default_context()
 ssl_context.check_hostname = False
 ssl_context.verify_mode = ssl.CERT_NONE
 
-slack_client = WebClient(token = SLACK_BOT_TOKEN,ssl = ssl_context)
+slack_client = WebClient(token=SLACK_BOT_TOKEN,ssl=ssl_context)
 
 app = Flask(__name__)
 
@@ -109,7 +109,7 @@ def verify_slack_token(request_token):
         return make_response("Request contains invalid Slack verification token", 403)
 
 # # The endpoint Slack will send the user's menu selection to
-@app.route("/slack/message_actions", methods = ["POST"])
+@app.route("/slack/message_actions", methods=["POST"])
 def message_actions():
 
     form_json = json.loads(request.form["payload"])
