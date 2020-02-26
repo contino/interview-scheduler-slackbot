@@ -18,7 +18,7 @@ ssl_context = ssl.create_default_context()
 ssl_context.check_hostname = False
 ssl_context.verify_mode = ssl.CERT_NONE
 
-slack_client=WebClient(token=SLACK_BOT_TOKEN,ssl=ssl_context)
+slack_client=WebClient(token = SLACK_BOT_TOKEN,ssl = ssl_context)
 
 app = Flask(__name__)
 
@@ -95,8 +95,8 @@ def post_message(service,channel_id,user_email,user_real_name):
     initial_message = [{ "blocks": blocks }]
 
     response = slack_client.chat_postMessage(
-      channel=channel_id,
-      attachments=json.dumps(initial_message)
+      channel = channel_id,
+      attachments = json.dumps(initial_message)
     )
 
     return response
@@ -109,7 +109,7 @@ def verify_slack_token(request_token):
         return make_response("Request contains invalid Slack verification token", 403)
 
 # # The endpoint Slack will send the user's menu selection to
-@app.route("/slack/message_actions", methods=["POST"])
+@app.route("/slack/message_actions", methods = ["POST"])
 def message_actions():
 
     form_json = json.loads(request.form["payload"])
@@ -131,16 +131,16 @@ def message_actions():
 
     if insert_response["status"] == 'confirmed':
         response = slack_client.chat_postMessage(
-            channel=form_json["channel"]["id"],
-            thread_ts=form_json["message"]["ts"],
-            text=form_json["actions"][0]["selected_option"]["value"].split("T")[0] + "\t" 
+            channel = form_json["channel"]["id"],
+            thread_ts = form_json["message"]["ts"],
+            text = form_json["actions"][0]["selected_option"]["value"].split("T")[0] + "\t" 
             + form_json["actions"][0]["selected_option"]["text"]["text"] + " scheduled ✅"
         )
 
     return make_response("", 200)
 
 def json_pretty(json_block):
-    json_formatted_str = json.dumps(json_block, indent=2)
+    json_formatted_str = json.dumps(json_block, indent = 2)
     print(json_formatted_str)
 
 get_user_list()
