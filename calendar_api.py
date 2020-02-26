@@ -198,8 +198,3 @@ def next_weekday(weekday):
     days_ahead += 7
     next_weekday = today + datetime.timedelta(days_ahead)
     return datetime.datetime.combine(next_weekday.date(), datetime.time(0,0,0,0))
-
-# def get_workingdays():
-
-if __name__ == '__main__':
-    main()
