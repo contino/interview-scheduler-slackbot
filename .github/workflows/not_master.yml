@@ -14,8 +14,8 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     
-    - name: Secret Scan
-      uses: max/secret-scan@master
+    - name: Detect Secrets
+      uses: evanextreme/detect-secrets@1.0.0
 
     - name: python-syntax-check
       uses: cclauss/Find-Python-syntax-errors-action@master
