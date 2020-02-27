@@ -27,9 +27,9 @@ def get_user_list():
     service = calendar_api.get_service()
 
     interview_calendar_events = calendar_api.get_events_for_next_week(service,
-                                                                        calendar_api.next_weekday(0),
-                                                                        calendar_api.next_weekday(5),
-                                                                        INTERVIEW_AVAIL_CAL)
+                                                                      calendar_api.next_weekday(0),
+                                                                      calendar_api.next_weekday(5),
+                                                                      INTERVIEW_AVAIL_CAL)
 
     already_signed_up_users = []
 
@@ -67,10 +67,8 @@ def post_message(service, channel_id, user_email, user_real_name):
                                                     calendar_api.next_weekday(0),
                                                     calendar_api.next_weekday(5))
 
-    for day in weekdays: #each day's events are encased in their own array
-
+    for day in weekdays:
         options = []
-        
         for free_slot in day:
 
             option = {
@@ -102,11 +100,11 @@ def post_message(service, channel_id, user_email, user_real_name):
 
         blocks.append(drop_down)
 
-    initial_message = [{ "blocks": blocks }]
+    initial_message = [{"blocks": blocks}]
 
     response = slack_client.chat_postMessage(
-      channel = channel_id,
-      attachments = json.dumps(initial_message)
+      channel=channel_id,
+      attachments=json.dumps(initial_message)
     )
 
     return response
@@ -138,7 +136,7 @@ def message_actions():
     user_tz = form_json["actions"][0]["action_id"].split("_")[1]
     user_real_name = form_json["actions"][0]["action_id"].split("_")[2].replace("%", " ")
 
-    insert_response = calendar_api.create_event(calendar_api.get_service(), 
+    insert_response = calendar_api.create_event(calendar_api.get_service(),
                                                 INTERVIEW_AVAIL_CAL,
                                                 user_email, user_tz,
                                                 event_start, event_end, user_real_name)
@@ -147,9 +145,9 @@ def message_actions():
 
     if insert_response["status"] == 'confirmed':
         response = slack_client.chat_postMessage(
-            channel = form_json["channel"]["id"],
-            thread_ts = form_json["message"]["ts"],
-            text = form_json["actions"][0]["selected_option"]["value"].split("T")[0] + "\t" 
+            channel=form_json["channel"]["id"],
+            thread_ts=form_json["message"]["ts"],
+            text=form_json["actions"][0]["selected_option"]["value"].split("T")[0] + "\t"
             + form_json["actions"][0]["selected_option"]["text"]["text"] + " scheduled ✅"
         )
 
@@ -158,7 +156,7 @@ def message_actions():
 
 def json_pretty(json_block):
 
-    json_formatted_str = json.dumps(json_block, indent = 2)
+    json_formatted_str = json.dumps(json_block, indent=2)
     print(json_formatted_str)
 
 
