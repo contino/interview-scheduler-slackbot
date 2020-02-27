@@ -27,7 +27,10 @@ def get_user_list():
 
     service = calendar_api.get_service()
 
-    interview_calendar_events = calendar_api.get_events_for_next_week(service, calendar_api.next_weekday(0), calendar_api.next_weekday(5), INTERVIEW_AVAIL_CAL)
+    interview_calendar_events = calendar_api.get_events_for_next_week(service,
+                                                                    calendar_api.next_weekday(0),
+                                                                    calendar_api.next_weekday(5),
+                                                                    INTERVIEW_AVAIL_CAL)
 
     already_signed_up_users = []
 
@@ -51,13 +54,19 @@ def post_message(service, channel_id, user_email, user_real_name):
         "type": "section",
         "text": {
             "type": "mrkdwn",
-            "text": "Hello Contini! I checked your Interview availability calendar for next week and it looks like you have not scheduled a slot. I checked your calendar and have some options below, pick one and I will set it up for you on the interview availability calendar."
+            "text": "Hello Contini! I checked your Interview availability calendar \
+            for next week and it looks like you have not scheduled a slot. I checked \
+            your calendar and have some options below, pick one and I will set it up \
+            for you on the interview availability calendar."
         }
     }
 
     blocks.append(welcome_block)
 
-    weekdays = calendar_api.get_free_slots_for_week(service, user_email, calendar_api.next_weekday(0), calendar_api.next_weekday(5))
+    weekdays = calendar_api.get_free_slots_for_week(service,
+                                                    user_email,
+                                                    calendar_api.next_weekday(0),
+                                                    calendar_api.next_weekday(5))
 
     for day in weekdays: #each day's events are encased in their own array
 
@@ -130,7 +139,10 @@ def message_actions():
     user_tz = form_json["actions"][0]["action_id"].split("_")[1]
     user_real_name = form_json["actions"][0]["action_id"].split("_")[2].replace("%", " ")
 
-    insert_response = calendar_api.create_event(calendar_api.get_service(), INTERVIEW_AVAIL_CAL, user_email, user_tz, event_start, event_end, user_real_name)
+    insert_response = calendar_api.create_event(calendar_api.get_service(), 
+                                                INTERVIEW_AVAIL_CAL,
+                                                user_email, user_tz,
+                                                event_start, event_end, user_real_name)
 
     json_pretty(insert_response)
 
