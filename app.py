@@ -26,7 +26,7 @@ def get_user_list():
 
     service = calendar_api.get_service()
 
-    interview_calendar_events = calendar_api.get_events_for_next_week(  service,
+    interview_calendar_events = calendar_api.get_events_for_next_week(service,
                                                                         calendar_api.next_weekday(0),
                                                                         calendar_api.next_weekday(5),
                                                                         INTERVIEW_AVAIL_CAL)
