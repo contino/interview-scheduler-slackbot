@@ -22,8 +22,8 @@ slack_client = WebClient(token=SLACK_BOT_TOKEN, ssl=ssl_context)
 
 app = Flask(__name__)
 
-def get_user_list():
 
+def get_user_list():
 
     service = calendar_api.get_service()
 
@@ -42,8 +42,8 @@ def get_user_list():
             response = post_message(service, item["id"], DEMO_USER_CAL, item["profile"]["real_name_normalized"].replace(" ", "%"))
             print("Message delivered:" + " " + str(response["ok"]))
 
-def post_message(service, channel_id, user_email, user_real_name):
 
+def post_message(service, channel_id, user_email, user_real_name):
 
     blocks = []
 
@@ -107,16 +107,15 @@ def post_message(service, channel_id, user_email, user_real_name):
 # Helper for verifying that requests came from Slack
 def verify_slack_token(request_token):
 
-
     if SLACK_VERIFICATION_TOKEN != request_token:
         print("Error: invalid verification token!")
         print("Received {} but was expecting {}".format(request_token, SLACK_VERIFICATION_TOKEN))
         return make_response("Request contains invalid Slack verification token", 403)
 
+
 # # The endpoint Slack will send the user's menu selection to
 @app.route("/slack/message_actions", methods=["POST"])
 def message_actions():
-
 
     form_json = json.loads(request.form["payload"])
 
@@ -145,13 +144,15 @@ def message_actions():
 
     return make_response("", 200)
 
+
 def json_pretty(json_block):
 
-    
     json_formatted_str = json.dumps(json_block, indent = 2)
     print(json_formatted_str)
 
+
 get_user_list()
+
 
 if __name__ == "__main__":
     app.run()
