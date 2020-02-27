@@ -24,4 +24,5 @@ jobs:
 
     - name: python-lint
       uses: CyberZHG/github-action-python-lint@0.0.2
-      args: "--max-line-length=120"
+      with:
+        args: "--max-line-length=120"
