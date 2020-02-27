@@ -38,10 +38,10 @@ def get_user_list():
     for item in payload["members"]:
         if "email" in item["profile"] and item["profile"]["email"] not in already_signed_up_users:
             print(item["id"] + " " + item["profile"]["real_name_normalized"] + " " + item["profile"]["email"])
-            response = post_message(service,item["id"], DEMO_USER_CAL, item["profile"]["real_name_normalized"].replace(" ", "%"))
+            response = post_message(service, item["id"], DEMO_USER_CAL, item["profile"]["real_name_normalized"].replace(" ", "%"))
             print("Message delivered:" + " " + str(response["ok"]))
 
-def post_message(service,channel_id,user_email,user_real_name):
+def post_message(service, channel_id, user_email, user_real_name):
 
     blocks = []
 
@@ -125,7 +125,7 @@ def message_actions():
     user_tz = form_json["actions"][0]["action_id"].split("_")[1]
     user_real_name = form_json["actions"][0]["action_id"].split("_")[2].replace("%", " ")
 
-    insert_response = calendar_api.create_event(calendar_api.get_service(), INTERVIEW_AVAIL_CAL, user_email, user_tz, event_start, event_end,user_real_name)
+    insert_response = calendar_api.create_event(calendar_api.get_service(), INTERVIEW_AVAIL_CAL, user_email, user_tz, event_start, event_end, user_real_name)
 
     json_pretty(insert_response)
 
