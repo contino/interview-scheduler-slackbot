@@ -11,7 +11,6 @@ SLACK_BOT_TOKEN = os.environ["SLACK_BOT_TOKEN"]
 SLACK_VERIFICATION_TOKEN = os.environ["SLACK_VERIFICATION_TOKEN"]
 INTERVIEW_AVAIL_CAL = os.environ["INTERVIEW_AVAIL_CAL"]
 
-
 DEMO_USER_CAL = 'ashok.gadepalli@contino.io'
 
 ssl_context = ssl.create_default_context()
@@ -27,10 +26,10 @@ def get_user_list():
 
     service = calendar_api.get_service()
 
-    interview_calendar_events = calendar_api.get_events_for_next_week(service,
-                                                                    calendar_api.next_weekday(0),
-                                                                    calendar_api.next_weekday(5),
-                                                                    INTERVIEW_AVAIL_CAL)
+    interview_calendar_events = calendar_api.get_events_for_next_week(  service,
+                                                                        calendar_api.next_weekday(0),
+                                                                        calendar_api.next_weekday(5),
+                                                                        INTERVIEW_AVAIL_CAL)
 
     already_signed_up_users = []
 
