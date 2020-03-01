@@ -24,7 +24,7 @@ functions:
   send_messages:
     handler: send_messages.lambda_handler
     events:
-      - schedule: cron(25 22 ? * 7 *) #2pm utc friday
+      - schedule: cron(0 14 ? * 1 *) #2pm utc friday
     environment:
       SLACK_BOT_TOKEN: ${env:SLACK_BOT_TOKEN}
       SLACK_VERIFICATION_TOKEN: ${env:SLACK_VERIFICATION_TOKEN}

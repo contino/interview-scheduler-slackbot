@@ -104,7 +104,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/serverless-flask/master/1583101135204-2020-03-01T22:18:55.204Z/serverless-flask.zip"
+          "S3Key": "serverless/serverless-flask/master/1583103223556-2020-03-01T22:53:43.556Z/serverless-flask.zip"
         },
         "FunctionName": "serverless-flask-master-send_messages",
         "Handler": "send_messages.lambda_handler",
@@ -119,7 +119,7 @@
         "Timeout": 6,
         "Environment": {
           "Variables": {
-            "SLACK_BOT_TOKEN": "xoxb-944033221973-954347421926-mKpkJu19UvPAT29c4FYp5NJz",
+            "SLACK_BOT_TOKEN": "xoxb-944033221973-954347421926-APwFL7qEWheYYWw2GubehbrD",
             "SLACK_VERIFICATION_TOKEN": "fYSp1k2g5FubaL485hUtYimk",
             "INTERVIEW_AVAIL_CAL": "contino.io_eepahmdv2bb1tvhbvv0ictha3g@group.calendar.google.com",
             "SVC_ACCOUNT_PRIV_KEY_ID": "191161d4fadad103860896f1149f9bd59cf92dfb",
@@ -135,14 +135,14 @@
         "IamRoleLambdaExecution"
       ]
     },
-    "SendUnderscoremessagesLambdaVersionFZIsSKUIFt3XEVwd0cuU5n32ILsJxjD42seixaHSl6E": {
+    "SendUnderscoremessagesLambdaVersionS9iL5vfsvgGnl84O1i5bMQ0GG1keSuQMAj5VLjJUn0": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "SendUnderscoremessagesLambdaFunction"
         },
-        "CodeSha256": "IZ1hX/7qVQ11QuVkincMPaFbZ4cxDwb4CA0lubxYlvE="
+        "CodeSha256": "nznktbJAUOo8kVYteNvUsvK4bV9o3q20ahi0gt+sEr4="
       }
     },
     "AppLambdaFunction": {
@@ -152,7 +152,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/serverless-flask/master/1583101135204-2020-03-01T22:18:55.204Z/serverless-flask.zip"
+          "S3Key": "serverless/serverless-flask/master/1583103223556-2020-03-01T22:53:43.556Z/serverless-flask.zip"
         },
         "FunctionName": "serverless-flask-master-app",
         "Handler": "wsgi_handler.handler",
@@ -167,7 +167,7 @@
         "Timeout": 6,
         "Environment": {
           "Variables": {
-            "SLACK_BOT_TOKEN": "xoxb-944033221973-954347421926-mKpkJu19UvPAT29c4FYp5NJz",
+            "SLACK_BOT_TOKEN": "xoxb-944033221973-954347421926-APwFL7qEWheYYWw2GubehbrD",
             "SLACK_VERIFICATION_TOKEN": "fYSp1k2g5FubaL485hUtYimk",
             "INTERVIEW_AVAIL_CAL": "contino.io_eepahmdv2bb1tvhbvv0ictha3g@group.calendar.google.com",
             "SVC_ACCOUNT_PRIV_KEY_ID": "191161d4fadad103860896f1149f9bd59cf92dfb",
@@ -183,20 +183,20 @@
         "IamRoleLambdaExecution"
       ]
     },
-    "AppLambdaVersionNOpKUYUpZQbhhlg3PLYeG7EoNGN9zIjdJ7r1Nbft7u0": {
+    "AppLambdaVersion7d3qfSJ4ALgMxlkMQKDv9IdHGPo2r8nDvDLZSx8dp6g": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "AppLambdaFunction"
         },
-        "CodeSha256": "IZ1hX/7qVQ11QuVkincMPaFbZ4cxDwb4CA0lubxYlvE="
+        "CodeSha256": "nznktbJAUOo8kVYteNvUsvK4bV9o3q20ahi0gt+sEr4="
       }
     },
     "SendUnderscoremessagesEventsRuleSchedule1": {
       "Type": "AWS::Events::Rule",
       "Properties": {
-        "ScheduleExpression": "cron(25 22 ? * 7 *)",
+        "ScheduleExpression": "cron(0 14 ? * 1 *)",
         "State": "ENABLED",
         "Targets": [
           {
@@ -355,7 +355,7 @@
         "MethodResponses": []
       }
     },
-    "ApiGatewayDeployment1583101135327": {
+    "ApiGatewayDeployment1583103223677": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "RestApiId": {
@@ -425,13 +425,13 @@
     "SendUnderscoremessagesLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "SendUnderscoremessagesLambdaVersionFZIsSKUIFt3XEVwd0cuU5n32ILsJxjD42seixaHSl6E"
+        "Ref": "SendUnderscoremessagesLambdaVersionS9iL5vfsvgGnl84O1i5bMQ0GG1keSuQMAj5VLjJUn0"
       }
     },
     "AppLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "AppLambdaVersionNOpKUYUpZQbhhlg3PLYeG7EoNGN9zIjdJ7r1Nbft7u0"
+        "Ref": "AppLambdaVersion7d3qfSJ4ALgMxlkMQKDv9IdHGPo2r8nDvDLZSx8dp6g"
       }
     },
     "ServiceEndpoint": {

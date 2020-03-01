@@ -31,10 +31,12 @@ def lambda_handler(event, context):
     already_signed_up_users = get_already_signed_up_users(service)
 
     for item in payload["members"]:
+
         if "email" in item["profile"] and item["profile"]["email"] not in already_signed_up_users:
-            print(item["id"] + " " + item["profile"]["real_name_normalized"] + " " + item["profile"]["email"])
+
             response = post_message(service, item["id"], DEMO_USER_CAL, item["profile"]["real_name_normalized"].replace(" ", "%"))
-            print("Message delivered:" + " " + str(response["ok"]))
+
+            print(item["id"] + " " + item["profile"]["real_name_normalized"] + " " + item["profile"]["email"] + " " + str(response["ok"]))
 
 
 def get_already_signed_up_users(service):
