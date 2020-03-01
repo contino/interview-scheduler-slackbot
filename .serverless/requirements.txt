@@ -4,6 +4,7 @@ google-api-python-client==1.6.2
 google-auth-httplib2
 google-auth-oauthlib
 pytz
+schedule
 slackclient>=2.0.0
 slackeventsapi>=2.1.0
 websocket-client==0.47.0

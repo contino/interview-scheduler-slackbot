@@ -3,7 +3,7 @@
 service: serverless-flask
 
 plugins:
-  - serverless-python-requirementso
+  - serverless-python-requirements
   - serverless-wsgi
 
 custom:
@@ -20,6 +20,21 @@ provider:
   region: us-east-1
 
 functions:
+
+  send_messages:
+    handler: send_messages.lambda_handler
+    events:
+      - schedule: cron(25 22 ? * 7 *) #2pm utc friday
+    environment:
+      SLACK_BOT_TOKEN: ${env:SLACK_BOT_TOKEN}
+      SLACK_VERIFICATION_TOKEN: ${env:SLACK_VERIFICATION_TOKEN}
+      INTERVIEW_AVAIL_CAL: ${env:INTERVIEW_AVAIL_CAL}
+      SVC_ACCOUNT_PRIV_KEY_ID: ${env:SVC_ACCOUNT_PRIV_KEY_ID}
+      SVC_ACCOUNT_PRIV_KEY: ${env:SVC_ACCOUNT_PRIV_KEY}
+      SVC_ACCOUNT_EMAIL: ${env:SVC_ACCOUNT_EMAIL}
+      SVC_ACCOUNT_ID: ${env:SVC_ACCOUNT_ID}
+      SVC_ACCOUNT_X509_CERT_URL: ${env:SVC_ACCOUNT_X509_CERT_URL}
+
   app:
     handler: wsgi_handler.handler
     events:

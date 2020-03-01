@@ -16,7 +16,31 @@ SCOPES = ['https://www.googleapis.com/auth/calendar.readonly', 'https://www.goog
 INTERVIEW_AVAIL_CAL = os.environ["INTERVIEW_AVAIL_CAL"]
 
 
-def get_service():
+def get_service_local_creds():
+
+    creds = None
+
+    if os.path.exists('token.pickle'):
+        with open('token.pickle', 'rb') as token:
+            creds = pickle.load(token)
+
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file(
+                'credentials.json', SCOPES)
+            creds = flow.run_local_server(port=0)
+        # Save the credentials for the next run
+        with open('token.pickle', 'wb') as token:
+            pickle.dump(creds, token)
+
+    service = build('calendar', 'v3', credentials=creds)
+
+    return service
+
+
+def get_service_delegated():
 
     service_account_creds = {
         "type": "service_account",
@@ -36,7 +60,7 @@ def get_service():
 
     delegated_credentials = credentials.with_subject('ashok.gadepalli@contino.io')  # will change it Melissa's when ready
 
-    service = build('calendar', 'v3', credentials=delegated_credentials)
+    service = build('calendar', 'v3', credentials=delegated_credentials, cache_discovery=False)
 
     return service
 
