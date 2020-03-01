@@ -21,10 +21,11 @@ ssl_context.verify_mode = ssl.CERT_NONE
 
 slack_client = WebClient(token=SLACK_BOT_TOKEN, ssl=ssl_context)
 
-service = calendar_api.get_service_delegated() #  use this if you are using a Google Cloud API service account
-# service = calendar_api.get_service_local_creds() #  use this if you are using local credentials
+service = calendar_api.get_service_delegated()  # use this if you are using a Google Cloud API service account
+# service = calendar_api.get_service_local_creds()  # use this if you are using local credentials
 
 app = Flask(__name__)
+
 
 # Helper for verifying that requests came from Slack
 def verify_slack_token(request_token):
@@ -74,6 +75,7 @@ def json_pretty(json_block):
 
     json_formatted_str = json.dumps(json_block, indent=2)
     print(json_formatted_str)
+
 
 if __name__ == "__main__":
     app.run()
