@@ -23,8 +23,8 @@ slack_client = WebClient(token=SLACK_BOT_TOKEN, ssl=ssl_context)
 
 def lambda_handler(event, context):
 
-    service = calendar_api.get_service_delegated() #  use this if you are using a Google Cloud API service account
-    # service = calendar_api.get_service_local_creds() #  use this if you are using local credentials
+    service = calendar_api.get_service_delegated()  # use this if you are using a Google Cloud API service account
+    # service = calendar_api.get_service_local_creds()  # use this if you are using local credentials
 
     payload = get_user_list(service)
 
@@ -121,6 +121,7 @@ def post_message(service, channel_id, user_email, user_real_name):
     )
 
     return response
+
 
 def json_pretty(json_block):
 
