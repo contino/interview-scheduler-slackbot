@@ -43,7 +43,7 @@ https://slack.com/help/articles/206845317-Create-a-Slack-workspace
 
 ## Download credentials for the Google Calendar API
 
-Go to the page below and click on the `Enable Google Calendar API` button. Download the client config `credentials.json` from the dialog box.
+Switch to your personal google account, go to the page below and click on the `Enable Google Calendar API` button. Download the client config `credentials.json` from the dialog box.
 
 https://developers.google.com/calendar/quickstart/python
 
