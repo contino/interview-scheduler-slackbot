@@ -94,6 +94,8 @@ So you successfully sent a message to your Slack dm from the bot. Now you can go
 
 1) When you make a selection, Slack sends an HTTP POST to the `Requests URL` you define in the Slack API interface. Your requests URL should also match the endpoint which the app is listening on. `/slack/message_actions`
 
+https://api.slack.com/apps
+
 ![screen capture](./images/requestsurl.png)
 
 2) If you are running the bot locally, make sure ngrok and the app are running on the same port. It is `5000` by default.
