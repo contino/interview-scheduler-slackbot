@@ -1,0 +1,51 @@
+# serverless.yml
+
+service: serverless-flask
+
+plugins:
+  - serverless-python-requirements
+  - serverless-wsgi
+
+custom:
+  wsgi:
+    app: app.app
+    packRequirements: false
+  pythonRequirements:
+    dockerizePip: non-linux
+
+provider:
+  name: aws
+  runtime: python3.7
+  stage: ${opt:stage}
+  region: us-east-1
+
+functions:
+
+  send_messages:
+    handler: send_messages.lambda_handler
+    events:
+      - schedule: cron(0 14 ? * 1 *) #2pm utc friday
+    environment:
+      SLACK_BOT_TOKEN: ${env:SLACK_BOT_TOKEN}
+      SLACK_VERIFICATION_TOKEN: ${env:SLACK_VERIFICATION_TOKEN}
+      INTERVIEW_AVAIL_CAL: ${env:INTERVIEW_AVAIL_CAL}
+      SVC_ACCOUNT_PRIV_KEY_ID: ${env:SVC_ACCOUNT_PRIV_KEY_ID}
+      SVC_ACCOUNT_PRIV_KEY: ${env:SVC_ACCOUNT_PRIV_KEY}
+      SVC_ACCOUNT_EMAIL: ${env:SVC_ACCOUNT_EMAIL}
+      SVC_ACCOUNT_ID: ${env:SVC_ACCOUNT_ID}
+      SVC_ACCOUNT_X509_CERT_URL: ${env:SVC_ACCOUNT_X509_CERT_URL}
+
+  app:
+    handler: wsgi_handler.handler
+    events:
+      - http: ANY /
+      - http: 'ANY {proxy+}'
+    environment:
+      SLACK_BOT_TOKEN: ${env:SLACK_BOT_TOKEN}
+      SLACK_VERIFICATION_TOKEN: ${env:SLACK_VERIFICATION_TOKEN}
+      INTERVIEW_AVAIL_CAL: ${env:INTERVIEW_AVAIL_CAL}
+      SVC_ACCOUNT_PRIV_KEY_ID: ${env:SVC_ACCOUNT_PRIV_KEY_ID}
+      SVC_ACCOUNT_PRIV_KEY: ${env:SVC_ACCOUNT_PRIV_KEY}
+      SVC_ACCOUNT_EMAIL: ${env:SVC_ACCOUNT_EMAIL}
+      SVC_ACCOUNT_ID: ${env:SVC_ACCOUNT_ID}
+      SVC_ACCOUNT_X509_CERT_URL: ${env:SVC_ACCOUNT_X509_CERT_URL}

@@ -1,0 +1,21 @@
+name: dev-branch-workflow
+
+on:
+ push:
+  branches:
+    - '*'
+    - '!master'
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: python-syntax-check
+      uses: cclauss/Find-Python-syntax-errors-action@master
+
+    - name: python-lint
+      uses: CyberZHG/github-action-python-lint@0.0.2

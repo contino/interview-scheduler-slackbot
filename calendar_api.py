@@ -6,17 +6,17 @@ from pytz import timezone
 import pickle
 import os.path
 from googleapiclient.discovery import build
+from oauth2client.client import GoogleCredentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
+from google.oauth2 import service_account
 import json
 
-# If modifying these scopes, delete the file token.pickle.
-SCOPES = ['https://www.googleapis.com/auth/calendar.readonly','https://www.googleapis.com/auth/calendar.events']
-# INTERVIEW_AVAIL_CAL='contino.io_eepahmdv2bb1tvhbvv0ictha3g@group.calendar.google.com'
-INTERVIEW_AVAIL_CAL = 'ashok.gadepalli@contino.io'
-# calendar_timezone = 'America/New_York'
+SCOPES = ['https://www.googleapis.com/auth/calendar.readonly', 'https://www.googleapis.com/auth/calendar.events']
+INTERVIEW_AVAIL_CAL = os.environ["INTERVIEW_AVAIL_CAL"]
 
-def get_service():
+
+def get_service_local_creds():
 
     creds = None
 
@@ -39,7 +39,33 @@ def get_service():
 
     return service
 
-def create_event(service,interview_calendar,user_email,user_tz,event_start,event_end,user_real_name):
+
+def get_service_delegated():
+
+    service_account_creds = {
+        "type": "service_account",
+        "project_id": "deft-breaker-269101",
+        "private_key_id": os.environ["SVC_ACCOUNT_PRIV_KEY_ID"],
+        "private_key": os.environ["SVC_ACCOUNT_PRIV_KEY"].replace('\\n', '\n'),
+        "client_email": os.environ["SVC_ACCOUNT_EMAIL"],
+        "client_id": os.environ["SVC_ACCOUNT_ID"],
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "token_uri": "https://oauth2.googleapis.com/token",
+        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+        "client_x509_cert_url": os.environ["SVC_ACCOUNT_X509_CERT_URL"]
+    }
+
+    credentials = service_account.Credentials.from_service_account_info(
+        service_account_creds, scopes=SCOPES)
+
+    delegated_credentials = credentials.with_subject('ashok.gadepalli@contino.io')  # will change it Melissa's when ready
+
+    service = build('calendar', 'v3', credentials=delegated_credentials, cache_discovery=False)
+
+    return service
+
+
+def create_event(service, interview_calendar, user_email, user_tz, event_start, event_end, user_real_name):
 
     event = {
       'summary': user_real_name + " - Interview Block",
@@ -60,28 +86,30 @@ def create_event(service,interview_calendar,user_email,user_tz,event_start,event
     event = service.events().insert(calendarId=interview_calendar, body=event).execute()
     return event
 
-def get_events_for_next_week(service,next_weekday,last_weekday,calendar):
 
-    events_result = service.events().list(  calendarId=calendar,
-                                            timeMin=next_weekday.isoformat() + 'Z',
-                                            timeMax=last_weekday.isoformat() + 'Z',
-                                            singleEvents=True,
-                                            orderBy='startTime').execute()
+def get_events_for_next_week(service, next_weekday, last_weekday, calendar):
+
+    events_result = service.events().list(calendarId=calendar,
+                                          timeMin=next_weekday.isoformat() + 'Z',
+                                          timeMax=last_weekday.isoformat() + 'Z',
+                                          singleEvents=True,
+                                          orderBy='startTime').execute()
 
     events = events_result.get('items', [])
 
     return events
 
-def get_free_slots_for_week(service,calendar,next_weekday,last_weekday):
 
-    calendar_timezone = get_calendar_tz(service,calendar)
+def get_free_slots_for_week(service, calendar, next_weekday, last_weekday):
+
+    calendar_timezone = get_calendar_tz(service, calendar)
 
     next_weekday = timezone(calendar_timezone).localize(next_weekday)
     last_weekday = timezone(calendar_timezone).localize(last_weekday)
 
-    day_start_hour = 8 # 8am
-    day_end_hour = 18 # 5pm
-    duration = datetime.timedelta(hours=1) #interview length
+    day_start_hour = 8  # 8am
+    day_end_hour = 18  # 5pm
+    duration = datetime.timedelta(hours=1)  # interview length
 
     current_day = next_weekday
 
@@ -90,20 +118,15 @@ def get_free_slots_for_week(service,calendar,next_weekday,last_weekday):
     while current_day < last_weekday:
 
         next_day = current_day + datetime.timedelta(days=1)
-        
-####
 
         body = {
             "timeMin": current_day.isoformat(),
             "timeMax": next_day.isoformat(),
-            "timeZone": get_calendar_tz(service,calendar),
+            "timeZone": get_calendar_tz(service, calendar),
             "items": [{"id": calendar}]
         }
-        
-        eventsResult = service.freebusy().query(body=body).execute()
-        
-####
 
+        eventsResult = service.freebusy().query(body=body).execute()
         current_day_busy_events = eventsResult["calendars"][calendar]["busy"]
 
         day_start_time = datetime.datetime.combine(current_day.date(), datetime.time(day_start_hour))
@@ -119,7 +142,7 @@ def get_free_slots_for_week(service,calendar,next_weekday,last_weekday):
 
                 busy_event_start = (dateutil.parser.parse(busy_event["start"]))
                 busy_event_end = (dateutil.parser.parse(busy_event["end"]))
-                appointments.append((busy_event_start,busy_event_end))
+                appointments.append((busy_event_start, busy_event_end))
 
         slots_for_day = get_free_slots_for_day(hours, appointments, duration, current_day.date(), calendar_timezone)
 
@@ -130,6 +153,7 @@ def get_free_slots_for_week(service,calendar,next_weekday,last_weekday):
         current_day += datetime.timedelta(days=1)
 
     return slots_for_week
+
 
 def get_free_slots_for_day(hours, appointments, duration, date, timezone):
 
@@ -152,7 +176,7 @@ def get_free_slots_for_day(hours, appointments, duration, date, timezone):
             event['end'] = (start + duration).strftime("%H:%M")
             event['isostart'] = start.isoformat()
             event['isoend'] = (start + duration).isoformat()
-            
+
             slot['event'] = event
 
             slots_for_day.append(slot)
@@ -161,16 +185,18 @@ def get_free_slots_for_day(hours, appointments, duration, date, timezone):
 
     return slots_for_day
 
-def get_calendar_tz(service,calendar):
+
+def get_calendar_tz(service, calendar):
 
     calendar_json = service.calendars().get(calendarId=calendar).execute()
 
     return calendar_json["timeZone"]
 
+
 def get_calendars_list(service):
 
     # Call the Calendar API
-    now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
+    now = datetime.datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
 
     print('Getting the list of calendars')
 
@@ -181,25 +207,17 @@ def get_calendars_list(service):
     if not calendars:
         print('No calendars found.')
     for calendar in calendars:
-        # calid = calendar['id']
-        # print(calid, calendar['summary'])
-        get_calendar_tz(service,calendar['id'])
-        # print(json_pretty(calendar))
+        get_calendar_tz(service, calendar['id'])
 
-# def get_working_days_for_next_week(holiday_calendar):
 
 def json_pretty(json_block):
     json_formatted_str = json.dumps(json_block, indent=2)
     print(json_formatted_str)
+
 
 def next_weekday(weekday):
     today = datetime.datetime.today()
     days_ahead = weekday - today.weekday()
     days_ahead += 7
     next_weekday = today + datetime.timedelta(days_ahead)
-    return datetime.datetime.combine(next_weekday.date(), datetime.time(0,0,0,0))
-
-# def get_workingdays():
-
-if __name__ == '__main__':
-    main()
+    return datetime.datetime.combine(next_weekday.date(), datetime.time(0, 0, 0, 0))
