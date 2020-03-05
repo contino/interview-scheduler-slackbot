@@ -1,4 +1,5 @@
-![CI](https://github.com/contino/interview-scheduler-slackbot/workflows/CI/badge.svg?branch=master)
+![master-workflow](https://github.com/contino/interview-scheduler-slackbot/workflows/master-workflow/badge.svg)
+
 # interview-scheduler-slackbot 🤖
 
 ## What does this bot do?
