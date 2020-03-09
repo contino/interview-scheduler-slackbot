@@ -11,8 +11,7 @@ import time
 SLACK_BOT_TOKEN = os.environ["SLACK_BOT_TOKEN"]
 SLACK_VERIFICATION_TOKEN = os.environ["SLACK_VERIFICATION_TOKEN"]
 INTERVIEW_AVAIL_CAL = os.environ["INTERVIEW_AVAIL_CAL"]
-
-DEMO_USER_CAL = 'ashok.gadepalli@contino.io'
+TEST_EMAIL = os.environ["TEST_EMAIL_LIST"]
 
 ssl_context = ssl.create_default_context()
 ssl_context.check_hostname = False
@@ -20,23 +19,30 @@ ssl_context.verify_mode = ssl.CERT_NONE
 
 slack_client = WebClient(token=SLACK_BOT_TOKEN, ssl=ssl_context)
 
+# response = post_message(service, item["id"], DEMO_USER_CAL, item["profile"]["real_name_normalized"].replace(" ", "%"))
 
 def lambda_handler(event, context):
 
     service = calendar_api.get_service_delegated()  # use this if you are using a Google Cloud API service account
     # service = calendar_api.get_service_local_creds()  # use this if you are using local credentials
 
-    payload = get_user_list(service)
+    cursor = ''
 
-    already_signed_up_users = get_already_signed_up_users(service)
+    user_list = []
 
-    for item in payload["members"]:
+    user_list = get_user_list(service,cursor,user_list)
 
-        if "email" in item["profile"] and item["profile"]["email"] not in already_signed_up_users:
+    # already_signed_up_users = get_already_signed_up_users(service)
 
-            response = post_message(service, item["id"], DEMO_USER_CAL, item["profile"]["real_name_normalized"].replace(" ", "%"))
+    TEST_EMAIL_LIST = TEST_EMAIL.split(",")
 
-            print(item["id"] + " " + item["profile"]["real_name_normalized"] + " " + item["profile"]["email"] + " " + str(response["ok"]))
+    for item in user_list:
+
+        # if "email" in item["profile"] and item["profile"]["email"] not in already_signed_up_users:
+
+        if "email" in item["profile"] and item["profile"]["email"] and item["profile"]["email"] in TEST_EMAIL_LIST:
+
+            print(item["id"] + " " + item["profile"]["real_name_normalized"] + " " + item["profile"]["email"]) # + " " + str(response["ok"]))
 
 
 def get_already_signed_up_users(service):
@@ -54,12 +60,18 @@ def get_already_signed_up_users(service):
     return already_signed_up_users
 
 
-def get_user_list(service):
+def get_user_list(service,cursor,user_list):
 
-    payload = slack_client.api_call("users.list")
+    payload = slack_client.users_list(cursor=cursor)
 
-    return payload
+    for user in payload["members"]:
+        user_list.append(user)
 
+    if payload["response_metadata"]["next_cursor"]:
+        # print(payload["response_metadata"]["next_cursor"])
+        user_list = get_user_list(service,payload["response_metadata"]["next_cursor"],user_list)
+
+    return user_list
 
 def post_message(service, channel_id, user_email, user_real_name):
 
@@ -127,3 +139,5 @@ def json_pretty(json_block):
 
     json_formatted_str = json.dumps(json_block, indent=2)
     print(json_formatted_str)
+
+lambda_handler('','')

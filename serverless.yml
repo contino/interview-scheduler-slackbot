@@ -34,6 +34,7 @@ functions:
       SVC_ACCOUNT_EMAIL: ${env:SVC_ACCOUNT_EMAIL}
       SVC_ACCOUNT_ID: ${env:SVC_ACCOUNT_ID}
       SVC_ACCOUNT_X509_CERT_URL: ${env:SVC_ACCOUNT_X509_CERT_URL}
+      TEST_EMAIL_LIST: ${env.TEST_EMAIL_LIST}
 
   app:
     handler: wsgi_handler.handler
@@ -49,3 +50,4 @@ functions:
       SVC_ACCOUNT_EMAIL: ${env:SVC_ACCOUNT_EMAIL}
       SVC_ACCOUNT_ID: ${env:SVC_ACCOUNT_ID}
       SVC_ACCOUNT_X509_CERT_URL: ${env:SVC_ACCOUNT_X509_CERT_URL}
+      TEST_EMAIL_LIST: ${env.TEST_EMAIL_LIST}
