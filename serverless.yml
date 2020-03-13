@@ -23,6 +23,7 @@ functions:
 
   send_messages:
     handler: send_messages.lambda_handler
+    timeout: 600
     events:
       - schedule: cron(0 14 ? * 1 *) #2pm utc friday
     environment:
@@ -34,7 +35,7 @@ functions:
       SVC_ACCOUNT_EMAIL: ${env:SVC_ACCOUNT_EMAIL}
       SVC_ACCOUNT_ID: ${env:SVC_ACCOUNT_ID}
       SVC_ACCOUNT_X509_CERT_URL: ${env:SVC_ACCOUNT_X509_CERT_URL}
-      TEST_EMAIL_LIST: ${env.TEST_EMAIL_LIST}
+      TEST_EMAIL_LIST: ${env:TEST_EMAIL_LIST}
 
   app:
     handler: wsgi_handler.handler
@@ -50,4 +51,3 @@ functions:
       SVC_ACCOUNT_EMAIL: ${env:SVC_ACCOUNT_EMAIL}
       SVC_ACCOUNT_ID: ${env:SVC_ACCOUNT_ID}
       SVC_ACCOUNT_X509_CERT_URL: ${env:SVC_ACCOUNT_X509_CERT_URL}
-      TEST_EMAIL_LIST: ${env.TEST_EMAIL_LIST}

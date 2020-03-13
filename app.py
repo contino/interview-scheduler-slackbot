@@ -49,9 +49,9 @@ def message_actions():
     event_start = form_json["actions"][0]["selected_option"]["value"].split("_")[0]
     event_end = form_json["actions"][0]["selected_option"]["value"].split("_")[1]
 
-    user_email = form_json["actions"][0]["action_id"].split("_")[0]
-    user_tz = form_json["actions"][0]["action_id"].split("_")[1]
-    user_real_name = form_json["actions"][0]["action_id"].split("_")[2].replace("%", " ")
+    user_email = form_json["actions"][0]["action_id"].split(";")[0]
+    user_tz = form_json["actions"][0]["action_id"].split(";")[1]
+    user_real_name = form_json["actions"][0]["action_id"].split(";")[2].replace("%", " ")
 
     insert_response = calendar_api.create_event(service,
                                                 INTERVIEW_AVAIL_CAL,

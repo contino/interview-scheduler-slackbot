@@ -19,8 +19,6 @@ ssl_context.verify_mode = ssl.CERT_NONE
 
 slack_client = WebClient(token=SLACK_BOT_TOKEN, ssl=ssl_context)
 
-# response = post_message(service, item["id"], DEMO_USER_CAL, item["profile"]["real_name_normalized"].replace(" ", "%"))
-
 def lambda_handler(event, context):
 
     service = calendar_api.get_service_delegated()  # use this if you are using a Google Cloud API service account
@@ -40,7 +38,9 @@ def lambda_handler(event, context):
 
         # if "email" in item["profile"] and item["profile"]["email"] not in already_signed_up_users:
 
-        if "email" in item["profile"] and item["profile"]["email"] and item["profile"]["email"] in TEST_EMAIL_LIST:
+        if "email" in item["profile"] and item["profile"]["email"] in TEST_EMAIL_LIST:
+
+            response = post_message(service, item["id"], item["profile"]["email"], item["profile"]["real_name_normalized"].replace(" ", "%"))
 
             print(item["id"] + " " + item["profile"]["real_name_normalized"] + " " + item["profile"]["email"]) # + " " + str(response["ok"]))
 
@@ -114,7 +114,7 @@ def post_message(service, channel_id, user_email, user_real_name):
             },
             "accessory": {
                 "type": "static_select",
-                "action_id": user_email + "_" + day[0]["timezone"] + "_" + user_real_name,
+                "action_id": user_email + ";" + day[0]["timezone"] + ";" + user_real_name,
                 "placeholder": {
                     "type": "plain_text",
                     "text": "Select a slot"
@@ -132,6 +132,8 @@ def post_message(service, channel_id, user_email, user_real_name):
       attachments=json.dumps(initial_message)
     )
 
+    # json_pretty(initial_message)
+
     return response
 
 
@@ -139,5 +141,3 @@ def json_pretty(json_block):
 
     json_formatted_str = json.dumps(json_block, indent=2)
     print(json_formatted_str)
-
-lambda_handler('','')
