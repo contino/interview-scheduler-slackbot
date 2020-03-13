@@ -42,7 +42,7 @@ def lambda_handler(event, context):
 
             response = post_message(service, item["id"], item["profile"]["email"], item["profile"]["real_name_normalized"].replace(" ", "%"))
 
-            print(item["id"] + " " + item["profile"]["real_name_normalized"] + " " + item["profile"]["email"]) # + " " + str(response["ok"]))
+            print(item["id"] + " " + item["profile"]["real_name_normalized"] + " " + item["profile"]["email"] + " " + str(response["ok"]))
 
 
 def get_already_signed_up_users(service):
@@ -68,7 +68,7 @@ def get_user_list(service,cursor,user_list):
         user_list.append(user)
 
     if payload["response_metadata"]["next_cursor"]:
-        # print(payload["response_metadata"]["next_cursor"])
+
         user_list = get_user_list(service,payload["response_metadata"]["next_cursor"],user_list)
 
     return user_list
@@ -93,37 +93,41 @@ def post_message(service, channel_id, user_email, user_real_name):
                                                     calendar_api.next_weekday(5))
 
     for day in weekdays:
-        options = []
-        for free_slot in day:
 
-            option = {
+        if day: #empty if no free slots on given day
+
+            options = []
+
+            for free_slot in day:
+
+                option = {
+                    "text": {
+                        "type": "plain_text",
+                        "text": free_slot["event"]["start"] + " - " + free_slot["event"]["end"]
+                    },
+                    "value": free_slot["event"]["isostart"] + "_" + free_slot["event"]["isoend"]
+                }
+
+                options.append(option)
+
+            drop_down = {
+                "type": "section",
                 "text": {
-                    "type": "plain_text",
-                    "text": free_slot["event"]["start"] + " - " + free_slot["event"]["end"]
+                    "type": "mrkdwn",
+                    "text": "Pick a slot for " + day[0]["weekday"] + " " + day[0]["date"]
                 },
-                "value": free_slot["event"]["isostart"] + "_" + free_slot["event"]["isoend"]
+                "accessory": {
+                    "type": "static_select",
+                    "action_id": user_email + ";" + day[0]["timezone"] + ";" + user_real_name,
+                    "placeholder": {
+                        "type": "plain_text",
+                        "text": "Select a slot"
+                    },
+                    "options": options
+                }
             }
 
-            options.append(option)
-
-        drop_down = {
-            "type": "section",
-            "text": {
-                "type": "mrkdwn",
-                "text": "Pick a slot for " + day[0]["weekday"] + " " + day[0]["date"]
-            },
-            "accessory": {
-                "type": "static_select",
-                "action_id": user_email + ";" + day[0]["timezone"] + ";" + user_real_name,
-                "placeholder": {
-                    "type": "plain_text",
-                    "text": "Select a slot"
-                },
-                "options": options
-            }
-        }
-
-        blocks.append(drop_down)
+            blocks.append(drop_down)
 
     initial_message = [{"blocks": blocks}]
 
@@ -131,8 +135,6 @@ def post_message(service, channel_id, user_email, user_real_name):
       channel=channel_id,
       attachments=json.dumps(initial_message)
     )
-
-    # json_pretty(initial_message)
 
     return response
 

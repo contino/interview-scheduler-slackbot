@@ -25,7 +25,7 @@ functions:
     handler: send_messages.lambda_handler
     timeout: 600
     events:
-      - schedule: cron(0 14 ? * 1 *) #2pm utc friday
+      - schedule: cron(0 14 ? * 6 *) #2pm utc friday
     environment:
       SLACK_BOT_TOKEN: ${env:SLACK_BOT_TOKEN}
       SLACK_VERIFICATION_TOKEN: ${env:SLACK_VERIFICATION_TOKEN}
