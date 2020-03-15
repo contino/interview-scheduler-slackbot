@@ -13,15 +13,12 @@ SLACK_BOT_TOKEN = os.environ["SLACK_BOT_TOKEN"]
 SLACK_VERIFICATION_TOKEN = os.environ["SLACK_VERIFICATION_TOKEN"]
 INTERVIEW_AVAIL_CAL = os.environ["INTERVIEW_AVAIL_CAL"]
 
-DEMO_USER_CAL = 'ashok.gadepalli@contino.io'
-
 ssl_context = ssl.create_default_context()
 ssl_context.check_hostname = False
 ssl_context.verify_mode = ssl.CERT_NONE
 
 slack_client = WebClient(token=SLACK_BOT_TOKEN, ssl=ssl_context)
 
-service = calendar_api.get_service_delegated()  # use this if you are using a Google Cloud API service account
 # service = calendar_api.get_service_local_creds()  # use this if you are using local credentials
 
 app = Flask(__name__)
@@ -52,6 +49,8 @@ def message_actions():
     user_email = form_json["actions"][0]["action_id"].split(";")[0]
     user_tz = form_json["actions"][0]["action_id"].split(";")[1]
     user_real_name = form_json["actions"][0]["action_id"].split(";")[2].replace("%", " ")
+
+    service = calendar_api.get_service_delegated(user_email)
 
     insert_response = calendar_api.create_event(service,
                                                 INTERVIEW_AVAIL_CAL,
