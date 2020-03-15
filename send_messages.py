@@ -7,49 +7,66 @@ from slack import WebClient
 import calendar_api
 import schedule
 import time
+import boto3
+import datetime
 
 SLACK_BOT_TOKEN = os.environ["SLACK_BOT_TOKEN"]
 SLACK_VERIFICATION_TOKEN = os.environ["SLACK_VERIFICATION_TOKEN"]
 INTERVIEW_AVAIL_CAL = os.environ["INTERVIEW_AVAIL_CAL"]
-TEST_EMAIL = os.environ["TEST_EMAIL_LIST"]
 
 ssl_context = ssl.create_default_context()
 ssl_context.check_hostname = False
 ssl_context.verify_mode = ssl.CERT_NONE
 
 slack_client = WebClient(token=SLACK_BOT_TOKEN, ssl=ssl_context)
+read_only_email = 'ashok.gadepalli@contino.io'
+
+dynamodb_client = boto3.client('dynamodb', region_name='us-east-1')
+
+def json_pretty(json_block):
+
+    json_formatted_str = json.dumps(json_block, indent=2)
+    print(json_formatted_str)
+
+def get_users_from_dynamodb(dynamodb_client,table_name):
+
+    response = dynamodb_client.scan(
+        TableName=table_name,
+        Select='ALL_ATTRIBUTES')
+
+    return response["Items"]
 
 def lambda_handler(event, context):
 
-    service = calendar_api.get_service_delegated()  # use this if you are using a Google Cloud API service account
+    service = calendar_api.get_service_delegated(read_only_email)  # use this if you are using a Google Cloud API service account
     # service = calendar_api.get_service_local_creds()  # use this if you are using local credentials
 
-    cursor = ''
+    already_signed_up_users = get_already_signed_up_users(service)
 
-    user_list = []
+    interviewer_list = get_users_from_dynamodb(dynamodb_client,'interviewers')
 
-    user_list = get_user_list(service,cursor,user_list)
+    for interviewer in interviewer_list:
 
-    # already_signed_up_users = get_already_signed_up_users(service)
+        if interviewer["email_id"]["S"] not in already_signed_up_users:
 
-    TEST_EMAIL_LIST = TEST_EMAIL.split(",")
+            # response = post_message_to_interviewer(service, item["id"], item["profile"]["email"], item["profile"]["real_name_normalized"].replace(" ", "%"))
+            print('INTERVIEWER ' + interviewer["channel_id"]["S"] + " " + interviewer["real_name_normalized"]["S"] + " " + interviewer["email_id"]["S"])
 
-    for item in user_list:
+    shadower_list = get_users_from_dynamodb(dynamodb_client,'shadowers')
 
-        # if "email" in item["profile"] and item["profile"]["email"] not in already_signed_up_users:
+    for shadower in shadower_list:
 
-        if "email" in item["profile"] and item["profile"]["email"] in TEST_EMAIL_LIST:
+        if shadower["email_id"]["S"] not in already_signed_up_users:
 
-            response = post_message(service, item["id"], item["profile"]["email"], item["profile"]["real_name_normalized"].replace(" ", "%"))
-
-            print(item["id"] + " " + item["profile"]["real_name_normalized"] + " " + item["profile"]["email"] + " " + str(response["ok"]))
+            # response = post_message_to_shadower(service, item["id"], item["profile"]["email"], item["profile"]["real_name_normalized"].replace(" ", "%"))
+            print('SHADOWER ' + shadower["channel_id"]["S"] + " " + shadower["real_name_normalized"]["S"] + " " + shadower["email_id"]["S"])
 
 
 def get_already_signed_up_users(service):
 
     interview_calendar_events = calendar_api.get_events_for_next_week(service,
-                                                                      calendar_api.next_weekday(0),
-                                                                      calendar_api.next_weekday(5),
+                                                                      calendar_api.next_weekday(0,'next_week'),
+                                                                      calendar_api.next_weekday(5,'next_week'),
                                                                       INTERVIEW_AVAIL_CAL)
 
     already_signed_up_users = []
@@ -60,7 +77,7 @@ def get_already_signed_up_users(service):
     return already_signed_up_users
 
 
-def get_user_list(service,cursor,user_list):
+def get_user_list(cursor,user_list):
 
     payload = slack_client.users_list(cursor=cursor)
 
@@ -69,11 +86,11 @@ def get_user_list(service,cursor,user_list):
 
     if payload["response_metadata"]["next_cursor"]:
 
-        user_list = get_user_list(service,payload["response_metadata"]["next_cursor"],user_list)
+        user_list = get_user_list(payload["response_metadata"]["next_cursor"],user_list)
 
     return user_list
 
-def post_message(service, channel_id, user_email, user_real_name):
+def post_message_to_interviewer(service, channel_id, user_email, user_real_name):
 
     blocks = []
 
@@ -89,8 +106,8 @@ def post_message(service, channel_id, user_email, user_real_name):
 
     weekdays = calendar_api.get_free_slots_for_week(service,
                                                     user_email,
-                                                    calendar_api.next_weekday(0),
-                                                    calendar_api.next_weekday(5))
+                                                    calendar_api.next_weekday(0,'next_week'),
+                                                    calendar_api.next_weekday(5,'next_week'))
 
     for day in weekdays:
 
@@ -131,15 +148,41 @@ def post_message(service, channel_id, user_email, user_real_name):
 
     initial_message = [{"blocks": blocks}]
 
-    response = slack_client.chat_postMessage(
-      channel=channel_id,
-      attachments=json.dumps(initial_message)
-    )
+    # response = slack_client.chat_postMessage(
+    #   channel=channel_id,
+    #   attachments=json.dumps(initial_message)
+    # )
 
     return response
 
+# def post_message_to_shadower(service, channel_id, user_email, user_real_name, dynamodb_user_list):
 
-def json_pretty(json_block):
+def post_message_to_shadower():
 
-    json_formatted_str = json.dumps(json_block, indent=2)
-    print(json_formatted_str)
+    blocks = []
+
+    welcome_block = {
+        "type": "section",
+        "text": {
+            "type": "mrkdwn",
+            "text": "Hello Contini! Signup to shadow an interviewer next week! 🛑 New slots might have been created since you recieved this message."
+        }
+    }
+
+    blocks.append(welcome_block)
+
+    interview_calendar_events = calendar_api.get_events_for_next_week(calendar_api.get_service_delegated(read_only_email),
+                                                                      datetime.datetime.today(),
+                                                                      calendar_api.next_weekday(5,'this_week'),
+                                                                      INTERVIEW_AVAIL_CAL)
+
+
+    json_pretty(interview_calendar_events)
+
+
+    # initial_message = [{"blocks": blocks}]
+
+
+    # return response
+
+
