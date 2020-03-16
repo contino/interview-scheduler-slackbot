@@ -4,9 +4,6 @@ import json
 import send_messages
 import boto3
 
-INTERVIEWERS_LIST = os.environ["INTERVIEWERS_LIST"]
-SHADOWERS_LIST = os.environ["SHADOWERS_LIST"]
-
 dynamodb_client = boto3.client('dynamodb', region_name='us-east-1')
 
 def update_dynamodb_table(dynamodb_client, USER_BASE, table_name):
@@ -47,6 +44,6 @@ def update_dynamodb_table(dynamodb_client, USER_BASE, table_name):
             print(item["id"] + " " + item["profile"]["real_name_normalized"] + " " + item["profile"]["email"] + " " + str(response["ResponseMetadata"]["HTTPStatusCode"]))
 
 
-update_dynamodb_table(dynamodb_client, INTERVIEWERS_LIST, 'interviewers')
+update_dynamodb_table(dynamodb_client, os.environ["INTERVIEWERS_LIST"], 'interviewers_test')
 
-update_dynamodb_table(dynamodb_client, SHADOWERS_LIST, 'shadowers')
+# update_dynamodb_table(dynamodb_client, os.environ["SHADOWERS_LIST"], 'shadowers')

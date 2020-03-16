@@ -18,6 +18,12 @@ provider:
   runtime: python3.7
   stage: ${opt:stage}
   region: us-east-1
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+       - dynamodb:Scan
+       - dynamodb:UpdateItem
+      Resource: "arn:aws:dynamodb:us-east-1:342334665963:table/interviewers_test"
 
 functions:
 
@@ -35,7 +41,6 @@ functions:
       SVC_ACCOUNT_EMAIL: ${env:SVC_ACCOUNT_EMAIL}
       SVC_ACCOUNT_ID: ${env:SVC_ACCOUNT_ID}
       SVC_ACCOUNT_X509_CERT_URL: ${env:SVC_ACCOUNT_X509_CERT_URL}
-      TEST_EMAIL_LIST: ${env:TEST_EMAIL_LIST}
 
   app:
     handler: wsgi_handler.handler

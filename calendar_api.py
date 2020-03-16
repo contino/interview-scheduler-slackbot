@@ -40,7 +40,7 @@ def get_service_local_creds():
     return service
 
 
-def get_service_delegated():
+def get_service_delegated(user_email):
 
     service_account_creds = {
         "type": "service_account",
@@ -58,7 +58,7 @@ def get_service_delegated():
     credentials = service_account.Credentials.from_service_account_info(
         service_account_creds, scopes=SCOPES)
 
-    delegated_credentials = credentials.with_subject('ashok.gadepalli@contino.io')  # will change it Melissa's when ready
+    delegated_credentials = credentials.with_subject(user_email)  # will change it to Melissa's when ready
 
     service = build('calendar', 'v3', credentials=delegated_credentials, cache_discovery=False)
 
@@ -217,9 +217,14 @@ def json_pretty(json_block):
     print(json_formatted_str)
 
 
-def next_weekday(weekday):
-    today = datetime.datetime.today()
+def next_weekday(weekday,week):
+    today = datetime.datetime.today() + datetime.timedelta(1)
     days_ahead = weekday - today.weekday()
-    days_ahead += 7
+
+    if week == 'next_week':
+        days_ahead += 7
+    else:
+        days_ahead += 0
+
     next_weekday = today + datetime.timedelta(days_ahead)
     return datetime.datetime.combine(next_weekday.date(), datetime.time(0, 0, 0, 0))

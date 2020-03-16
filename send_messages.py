@@ -43,24 +43,15 @@ def lambda_handler(event, context):
 
     already_signed_up_users = get_already_signed_up_users(service)
 
-    interviewer_list = get_users_from_dynamodb(dynamodb_client,'interviewers')
+    interviewer_list = get_users_from_dynamodb(dynamodb_client,'interviewers_test')
 
     for interviewer in interviewer_list:
 
         if interviewer["email_id"]["S"] not in already_signed_up_users:
 
-            # response = post_message_to_interviewer(service, item["id"], item["profile"]["email"], item["profile"]["real_name_normalized"].replace(" ", "%"))
-            print('INTERVIEWER ' + interviewer["channel_id"]["S"] + " " + interviewer["real_name_normalized"]["S"] + " " + interviewer["email_id"]["S"])
+            response = post_message_to_interviewer(service, interviewer["channel_id"]["S"], interviewer["email_id"]["S"], interviewer["real_name_normalized"]["S"].replace(" ", "%"))
 
-    shadower_list = get_users_from_dynamodb(dynamodb_client,'shadowers')
-
-    for shadower in shadower_list:
-
-        if shadower["email_id"]["S"] not in already_signed_up_users:
-
-            # response = post_message_to_shadower(service, item["id"], item["profile"]["email"], item["profile"]["real_name_normalized"].replace(" ", "%"))
-            print('SHADOWER ' + shadower["channel_id"]["S"] + " " + shadower["real_name_normalized"]["S"] + " " + shadower["email_id"]["S"])
-
+            print('INTERVIEWER ' + interviewer["channel_id"]["S"] + " " + interviewer["real_name_normalized"]["S"] + " " + interviewer["email_id"]["S"] + " " + str(response['ok']))
 
 def get_already_signed_up_users(service):
 
@@ -148,41 +139,9 @@ def post_message_to_interviewer(service, channel_id, user_email, user_real_name)
 
     initial_message = [{"blocks": blocks}]
 
-    # response = slack_client.chat_postMessage(
-    #   channel=channel_id,
-    #   attachments=json.dumps(initial_message)
-    # )
+    response = slack_client.chat_postMessage(
+      channel=channel_id,
+      attachments=json.dumps(initial_message)
+    )
 
     return response
-
-# def post_message_to_shadower(service, channel_id, user_email, user_real_name, dynamodb_user_list):
-
-def post_message_to_shadower():
-
-    blocks = []
-
-    welcome_block = {
-        "type": "section",
-        "text": {
-            "type": "mrkdwn",
-            "text": "Hello Contini! Signup to shadow an interviewer next week! 🛑 New slots might have been created since you recieved this message."
-        }
-    }
-
-    blocks.append(welcome_block)
-
-    interview_calendar_events = calendar_api.get_events_for_next_week(calendar_api.get_service_delegated(read_only_email),
-                                                                      datetime.datetime.today(),
-                                                                      calendar_api.next_weekday(5,'this_week'),
-                                                                      INTERVIEW_AVAIL_CAL)
-
-
-    json_pretty(interview_calendar_events)
-
-
-    # initial_message = [{"blocks": blocks}]
-
-
-    # return response
-
-
