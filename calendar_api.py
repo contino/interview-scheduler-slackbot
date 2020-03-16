@@ -58,7 +58,7 @@ def get_service_delegated(user_email):
     credentials = service_account.Credentials.from_service_account_info(
         service_account_creds, scopes=SCOPES)
 
-    delegated_credentials = credentials.with_subject(user_email)  # will change it to Melissa's when ready
+    delegated_credentials = credentials.with_subject(user_email) #Interviewer is the creator of the event
 
     service = build('calendar', 'v3', credentials=delegated_credentials, cache_discovery=False)
 

@@ -43,7 +43,7 @@ def lambda_handler(event, context):
 
     already_signed_up_users = get_already_signed_up_users(service)
 
-    interviewer_list = get_users_from_dynamodb(dynamodb_client,'interviewers_test')
+    interviewer_list = get_users_from_dynamodb(dynamodb_client,'interviewers')
 
     for interviewer in interviewer_list:
 
@@ -51,7 +51,7 @@ def lambda_handler(event, context):
 
             response = post_message_to_interviewer(service, interviewer["channel_id"]["S"], interviewer["email_id"]["S"], interviewer["real_name_normalized"]["S"].replace(" ", "%"))
 
-            print('INTERVIEWER ' + interviewer["channel_id"]["S"] + " " + interviewer["real_name_normalized"]["S"] + " " + interviewer["email_id"]["S"] + " " + str(response['ok']))
+            print('INTERVIEWER ' + interviewer["channel_id"]["S"] + " " + interviewer["real_name_normalized"]["S"] + " " + interviewer["email_id"]["S"]) + " " + str(response['ok'])
 
 def get_already_signed_up_users(service):
 
@@ -80,6 +80,7 @@ def get_user_list(cursor,user_list):
         user_list = get_user_list(payload["response_metadata"]["next_cursor"],user_list)
 
     return user_list
+
 
 def post_message_to_interviewer(service, channel_id, user_email, user_real_name):
 
