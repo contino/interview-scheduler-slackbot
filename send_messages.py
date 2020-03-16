@@ -46,7 +46,7 @@ def lambda_handler(event, context):
 
     already_signed_up_users = get_already_signed_up_users(service)
 
-    interviewer_list = get_users_from_dynamodb(dynamodb_client, 'interviewers')
+    interviewer_list = get_users_from_dynamodb(dynamodb_client, 'interviewers_test')
 
     for interviewer in interviewer_list:
 

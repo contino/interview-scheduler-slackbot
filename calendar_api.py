@@ -218,7 +218,7 @@ def json_pretty(json_block):
 
 
 def next_weekday(weekday, week):
-    today = datetime.datetime.today() + datetime.timedelta(1)
+    today = datetime.datetime.today()
     days_ahead = weekday - today.weekday()
 
     if week == 'next_week':
