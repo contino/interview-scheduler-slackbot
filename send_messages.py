@@ -23,18 +23,21 @@ read_only_email = 'ashok.gadepalli@contino.io'
 
 dynamodb_client = boto3.client('dynamodb', region_name='us-east-1')
 
+
 def json_pretty(json_block):
 
     json_formatted_str = json.dumps(json_block, indent=2)
     print(json_formatted_str)
 
-def get_users_from_dynamodb(dynamodb_client,table_name):
+
+def get_users_from_dynamodb(dynamodb_client, table_name):
 
     response = dynamodb_client.scan(
         TableName=table_name,
         Select='ALL_ATTRIBUTES')
 
     return response["Items"]
+
 
 def lambda_handler(event, context):
 
@@ -43,21 +46,25 @@ def lambda_handler(event, context):
 
     already_signed_up_users = get_already_signed_up_users(service)
 
-    interviewer_list = get_users_from_dynamodb(dynamodb_client,'interviewers')
+    interviewer_list = get_users_from_dynamodb(dynamodb_client, 'interviewers')
 
     for interviewer in interviewer_list:
 
         if interviewer["email_id"]["S"] not in already_signed_up_users:
 
-            response = post_message_to_interviewer(service, interviewer["channel_id"]["S"], interviewer["email_id"]["S"], interviewer["real_name_normalized"]["S"].replace(" ", "%"))
+            response = post_message_to_interviewer(service,
+                                                   interviewer["channel_id"]["S"],
+                                                   interviewer["email_id"]["S"],
+                                                   interviewer["real_name_normalized"]["S"].replace(" ", "%"))
 
             print('INTERVIEWER ' + interviewer["channel_id"]["S"] + " " + interviewer["real_name_normalized"]["S"] + " " + interviewer["email_id"]["S"]) + " " + str(response['ok'])
+
 
 def get_already_signed_up_users(service):
 
     interview_calendar_events = calendar_api.get_events_for_next_week(service,
-                                                                      calendar_api.next_weekday(0,'next_week'),
-                                                                      calendar_api.next_weekday(5,'next_week'),
+                                                                      calendar_api.next_weekday(0, 'next_week'),
+                                                                      calendar_api.next_weekday(5, 'next_week'),
                                                                       INTERVIEW_AVAIL_CAL)
 
     already_signed_up_users = []
@@ -68,7 +75,7 @@ def get_already_signed_up_users(service):
     return already_signed_up_users
 
 
-def get_user_list(cursor,user_list):
+def get_user_list(cursor, user_list):
 
     payload = slack_client.users_list(cursor=cursor)
 
@@ -77,7 +84,7 @@ def get_user_list(cursor,user_list):
 
     if payload["response_metadata"]["next_cursor"]:
 
-        user_list = get_user_list(payload["response_metadata"]["next_cursor"],user_list)
+        user_list = get_user_list(payload["response_metadata"]["next_cursor"], user_list)
 
     return user_list
 
@@ -98,12 +105,12 @@ def post_message_to_interviewer(service, channel_id, user_email, user_real_name)
 
     weekdays = calendar_api.get_free_slots_for_week(service,
                                                     user_email,
-                                                    calendar_api.next_weekday(0,'next_week'),
-                                                    calendar_api.next_weekday(5,'next_week'))
+                                                    calendar_api.next_weekday(0, 'next_week'),
+                                                    calendar_api.next_weekday(5, 'next_week'))
 
     for day in weekdays:
 
-        if day: #empty if no free slots on given day
+        if day:  # empty if no free slots on given day
 
             options = []
 

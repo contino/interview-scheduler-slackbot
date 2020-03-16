@@ -8,9 +8,10 @@ import boto3
 
 dynamodb_client = boto3.client('dynamodb', region_name='us-east-1')
 
+
 def update_dynamodb_table(dynamodb_client, USER_BASE, table_name):
 
-    slack_user_list = send_messages.get_user_list('',[])
+    slack_user_list = send_messages.get_user_list('', [])  # recursive
 
     USER_BASE_LIST = USER_BASE.split(",")
 
