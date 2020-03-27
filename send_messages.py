@@ -7,22 +7,21 @@ from slack import WebClient
 import calendar_api
 import schedule
 import time
-import boto3
-import datetime
 
 SLACK_BOT_TOKEN = os.environ["SLACK_BOT_TOKEN"]
 SLACK_VERIFICATION_TOKEN = os.environ["SLACK_VERIFICATION_TOKEN"]
 INTERVIEW_AVAIL_CAL = os.environ["INTERVIEW_AVAIL_CAL"]
+INTERVIEWERS_TABLE = os.environ["INTERVIEWERS_TABLE"]
+AWS_REGION = os.environ['REGION']
+READ_ONLY_EMAIL = os.environ['READ_ONLY_EMAIL']
 
 ssl_context = ssl.create_default_context()
 ssl_context.check_hostname = False
 ssl_context.verify_mode = ssl.CERT_NONE
 
 slack_client = WebClient(token=SLACK_BOT_TOKEN, ssl=ssl_context)
-read_only_email = 'ashok.gadepalli@contino.io'
 
-dynamodb_client = boto3.client('dynamodb', region_name='us-east-1')
-
+dynamodb_client = boto3.client('dynamodb', region_name=AWS_REGION)
 
 def json_pretty(json_block):
 
@@ -41,12 +40,12 @@ def get_users_from_dynamodb(dynamodb_client, table_name):
 
 def lambda_handler(event, context):
 
-    service = calendar_api.get_service_delegated(read_only_email)  # use this if you are using a Google Cloud API service account
+    service = calendar_api.get_service_delegated(READ_ONLY_EMAIL)  # use this if you are using a Google Cloud API service account
     # service = calendar_api.get_service_local_creds()  # use this if you are using local credentials
 
     already_signed_up_users = get_already_signed_up_users(service)
 
-    interviewer_list = get_users_from_dynamodb(dynamodb_client, 'interviewers_test')
+    interviewer_list = get_users_from_dynamodb(dynamodb_client, INTERVIEWERS_TABLE)
 
     for interviewer in interviewer_list:
 
@@ -57,7 +56,7 @@ def lambda_handler(event, context):
                                                    interviewer["email_id"]["S"],
                                                    interviewer["real_name_normalized"]["S"].replace(" ", "%"))
 
-            print('INTERVIEWER ' + interviewer["channel_id"]["S"] + " " + interviewer["real_name_normalized"]["S"] + " " + interviewer["email_id"]["S"]) + " " + str(response['ok'])
+            print('INTERVIEWER ' + interviewer["channel_id"]["S"] + " " + interviewer["real_name_normalized"]["S"] + " " + interviewer["email_id"]["S"] + " " + str(response['ok']))
 
 
 def get_already_signed_up_users(service):

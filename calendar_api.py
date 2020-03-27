@@ -104,8 +104,6 @@ def get_free_slots_for_week(service, calendar, next_weekday, last_weekday):
 
     calendar_timezone = get_calendar_tz(service, calendar)
 
-    print(calendar_timezone)
-
     next_weekday = timezone(calendar_timezone).localize(next_weekday)
     last_weekday = timezone(calendar_timezone).localize(last_weekday)
 
@@ -147,8 +145,6 @@ def get_free_slots_for_week(service, calendar, next_weekday, last_weekday):
                 appointments.append((busy_event_start, busy_event_end))
 
         slots_for_day = get_free_slots_for_day(hours, appointments, duration, current_day.date(), calendar_timezone)
-
-        # for slot in slots_for_day:
 
         slots_for_week.append(slots_for_day)
 

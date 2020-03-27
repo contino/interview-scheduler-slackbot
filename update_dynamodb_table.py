@@ -9,15 +9,15 @@ import boto3
 dynamodb_client = boto3.client('dynamodb', region_name='us-east-1')
 
 
-def update_dynamodb_table(dynamodb_client, USER_BASE, table_name):
+def update_dynamodb_table(dynamodb_client, user_base, table_name):
 
     slack_user_list = send_messages.get_user_list('', [])  # recursive
 
-    USER_BASE_LIST = USER_BASE.split(",")
+    user_list = user_base.split(",")
 
     for item in slack_user_list:
 
-        if "email" in item["profile"] and item["profile"]["email"] in USER_BASE_LIST:
+        if "email" in item["profile"] and item["profile"]["email"] in user_list:
 
             response = dynamodb_client.update_item(
                     TableName=table_name,
