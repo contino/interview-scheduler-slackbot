@@ -6,7 +6,7 @@ import json
 import ssl
 from slack import WebClient
 import calendar_api
-import schedule
+# import schedule
 import time
 
 SLACK_BOT_TOKEN = os.environ["SLACK_BOT_TOKEN"]
