@@ -25,7 +25,6 @@ provider:
        - dynamodb:UpdateItem
       Resource:
        - "arn:aws:dynamodb:us-east-1:342334665963:table/interviewers"
-       - "arn:aws:dynamodb:us-east-1:342334665963:table/shadowers"
        - "arn:aws:dynamodb:us-east-1:342334665963:table/interviewers_test"
 
 functions:
@@ -34,7 +33,7 @@ functions:
     handler: send_messages.lambda_handler
     timeout: 600
     events:
-      - schedule: cron(0 13 ? * 6 *) #2pm utc friday
+      - schedule: cron(0 14 ? * 6 *) #2pm utc friday
     environment:
       SLACK_BOT_TOKEN: ${env:SLACK_BOT_TOKEN}
       SLACK_VERIFICATION_TOKEN: ${env:SLACK_VERIFICATION_TOKEN}

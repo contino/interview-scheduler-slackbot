@@ -60,7 +60,7 @@ def message_actions():
     json_pretty(insert_response)
 
     if insert_response["status"] == 'confirmed':
-        response = slack_client.chat_postMessage(
+        slack_client.chat_postMessage(
             channel=form_json["channel"]["id"],
             thread_ts=form_json["message"]["ts"],
             text=form_json["actions"][0]["selected_option"]["value"].split("T")[0] + " "

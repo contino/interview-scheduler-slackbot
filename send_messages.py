@@ -55,7 +55,7 @@ def lambda_handler(event, context):
                                                    interviewer["email_id"]["S"],
                                                    interviewer["real_name_normalized"]["S"].replace(" ", "%"))
 
-            print('INTERVIEWER ' + interviewer["channel_id"]["S"] + " " + interviewer["real_name_normalized"]["S"] + " " + interviewer["email_id"]["S"] + " " + str(response['ok']))
+            print('INTERVIEWER ' + interviewer["channel_id"]["S"] + " " + interviewer["real_name_normalized"]["S"] + " " + interviewer["email_id"]["S"])# + " " + str(response['ok']))
 
 
 def get_already_signed_up_users(service):
@@ -145,9 +145,11 @@ def post_message_to_interviewer(service, channel_id, user_email, user_real_name)
 
     initial_message = [{"blocks": blocks}]
 
-    response = slack_client.chat_postMessage(
-      channel=channel_id,
-      attachments=json.dumps(initial_message)
-    )
+    # response = slack_client.chat_postMessage(
+    #   channel=channel_id,
+    #   attachments=json.dumps(initial_message)
+    # )
 
-    return response
+    # return response
+
+lambda_handler('','')
