@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Serverless slackbot",
   "dependencies": {
+    "minimist": ">=0.2.1",
     "serverless-python-requirements": "^5.1.0",
     "serverless-wsgi": "^1.7.4"
   },
