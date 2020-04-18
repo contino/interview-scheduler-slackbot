@@ -25,7 +25,6 @@ provider:
        - dynamodb:UpdateItem
       Resource:
        - "arn:aws:dynamodb:us-east-1:342334665963:table/interviewers"
-       - "arn:aws:dynamodb:us-east-1:342334665963:table/shadowers"
        - "arn:aws:dynamodb:us-east-1:342334665963:table/interviewers_test"
 
 functions:
