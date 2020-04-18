@@ -4,9 +4,11 @@ import json
 import send_messages
 import boto3
 
+AWS_REGION = os.environ['REGION']
+
 # reads list of users from the environment and adds them to their specific table
 
-dynamodb_client = boto3.client('dynamodb', region_name='us-east-1')
+dynamodb_client = boto3.client('dynamodb', region_name=AWS_REGION)
 
 
 def update_dynamodb_table(dynamodb_client, user_base, table_name):

@@ -18,9 +18,8 @@ ssl_context = ssl.create_default_context()
 ssl_context.check_hostname = False
 ssl_context.verify_mode = ssl.CERT_NONE
 
-slack_client = WebClient(token=SLACK_BOT_TOKEN, ssl=ssl_context)
 
-dynamodb_client = boto3.client('dynamodb', region_name=AWS_REGION)
+slack_client = WebClient(token=SLACK_BOT_TOKEN, ssl=ssl_context)
 
 def json_pretty(json_block):
 
@@ -43,6 +42,8 @@ def lambda_handler(event, context):
     # service = calendar_api.get_service_local_creds()  # use this if you are using local credentials
 
     already_signed_up_users = get_already_signed_up_users(service)
+
+    dynamodb_client = boto3.client('dynamodb', region_name=AWS_REGION)
 
     interviewer_list = get_users_from_dynamodb(dynamodb_client, INTERVIEWERS_TABLE)
 
