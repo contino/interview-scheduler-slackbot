@@ -22,6 +22,7 @@ ssl_context.verify_mode = ssl.CERT_NONE
 
 slack_client = WebClient(token=SLACK_BOT_TOKEN, ssl=ssl_context)
 
+
 def json_pretty(json_block):
 
     json_formatted_str = json.dumps(json_block, indent=2)
@@ -42,6 +43,7 @@ def get_users_from_dynamodb(dynamodb_client, table_name):
         else:
             raise
 
+
 def remove_user_from_db(dynamodb_client, table_name, user_email):
 
     response = dynamodb_client.delete_item(
@@ -55,6 +57,7 @@ def remove_user_from_db(dynamodb_client, table_name, user_email):
 
     if response["ResponseMetadata"]["HTTPStatusCode"] == 200:
         print(user_email + " has been removed from the database.")
+
 
 def lambda_handler(event, context):
 
@@ -75,9 +78,9 @@ def lambda_handler(event, context):
                 remove_user_from_db(dynamodb_client, INTERVIEWERS_TABLE, interviewer["email_id"]["S"])
             else:
                 post_message_to_interviewer(service,
-                                           interviewer["channel_id"]["S"],
-                                           interviewer["email_id"]["S"],
-                                           interviewer["real_name_normalized"]["S"].replace(" ", "%"))
+                                            interviewer["channel_id"]["S"],
+                                            interviewer["email_id"]["S"],
+                                            interviewer["real_name_normalized"]["S"].replace(" ", "%"))
 
                 print('INTERVIEWER ' + interviewer["channel_id"]["S"] + " " + interviewer["real_name_normalized"]["S"] + " " + interviewer["email_id"]["S"])
 
@@ -158,7 +161,7 @@ def post_message_to_interviewer(service, channel_id, user_email, user_real_name)
 
     try:
         slack_client.chat_postMessage(
-          text = 'Hello Contini! Signup for an interview slot for next week. I have some free slots below!',
+          text='Hello Contini! Signup for an interview slot for next week. I have some free slots below!',
           channel=channel_id,
           attachments=json.dumps(initial_message)
         )
@@ -168,5 +171,3 @@ def post_message_to_interviewer(service, channel_id, user_email, user_real_name)
             print("Possible incorrect channel_id or deleted account.")
         else:
             print(e.response["error"] + " " + user_email)
-
-lambda_handler('','')

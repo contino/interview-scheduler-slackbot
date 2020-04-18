@@ -188,6 +188,7 @@ def get_user_calendar(service, calendar):
     except HttpError as err:
         return err.resp.status
 
+
 def get_calendar_tz(service, calendar):
     calendar_json = service.calendars().get(calendarId=calendar).execute()
     return calendar_json["timeZone"]
