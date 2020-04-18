@@ -67,7 +67,7 @@ def message_actions():
             )
         except SlackApiError as e:
             if e.response["error"] == 'user_not_found':
-                print(user_email + " channel_id:" + channel_id + " " + e.response["error"])
+                print(user_email + " channel_id:" + form_json["channel"]["id"] + " " + e.response["error"])
                 print("Possible incorrect channel_id or deleted account.")
             else:
                 print(e.response["error"] + " " + user_email)
