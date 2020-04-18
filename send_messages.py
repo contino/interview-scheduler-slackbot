@@ -21,6 +21,7 @@ ssl_context.verify_mode = ssl.CERT_NONE
 
 slack_client = WebClient(token=SLACK_BOT_TOKEN, ssl=ssl_context)
 
+
 def json_pretty(json_block):
 
     json_formatted_str = json.dumps(json_block, indent=2)
