@@ -10,6 +10,7 @@ from oauth2client.client import GoogleCredentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from google.oauth2 import service_account
+from googleapiclient.errors import HttpError
 import json
 
 SCOPES = ['https://www.googleapis.com/auth/calendar.readonly', 'https://www.googleapis.com/auth/calendar.events']
@@ -137,17 +138,13 @@ def get_free_slots_for_week(service, calendar, next_weekday, last_weekday):
         appointments = []
 
         if current_day_busy_events:
-
             for busy_event in current_day_busy_events:
-
                 busy_event_start = (dateutil.parser.parse(busy_event["start"]))
                 busy_event_end = (dateutil.parser.parse(busy_event["end"]))
                 appointments.append((busy_event_start, busy_event_end))
 
         slots_for_day = get_free_slots_for_day(hours, appointments, duration, current_day.date(), calendar_timezone)
-
         slots_for_week.append(slots_for_day)
-
         current_day += datetime.timedelta(days=1)
 
     return slots_for_week
@@ -184,22 +181,21 @@ def get_free_slots_for_day(hours, appointments, duration, date, timezone):
     return slots_for_day
 
 
+def get_user_calendar(service, calendar):
+    try:
+        response = service.calendars().get(calendarId=calendar).execute()
+        return response
+    except HttpError as err:
+        return err.resp.status
+
 def get_calendar_tz(service, calendar):
-
     calendar_json = service.calendars().get(calendarId=calendar).execute()
-
     return calendar_json["timeZone"]
 
 
 def get_calendars_list(service):
-
-    # Call the Calendar API
     now = datetime.datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
-
-    print('Getting the list of calendars')
-
     calendars_list = service.calendarList().list(maxResults=10).execute()
-
     calendars = calendars_list.get('items', [])
 
     if not calendars:

@@ -49,6 +49,6 @@ def update_dynamodb_table(dynamodb_client, user_base, table_name):
             print(item["id"] + " " + item["profile"]["real_name_normalized"] + " " + item["profile"]["email"] + " " + str(response["ResponseMetadata"]["HTTPStatusCode"]))
 
 
-update_dynamodb_table(dynamodb_client, os.environ["INTERVIEWERS_LIST"], 'interviewers')
+update_dynamodb_table(dynamodb_client, os.environ["INTERVIEWERS_LIST"], 'interviewers_test')
 
-update_dynamodb_table(dynamodb_client, os.environ["SHADOWERS_LIST"], 'shadowers')
+# update_dynamodb_table(dynamodb_client, os.environ["SHADOWERS_LIST"], 'shadowers')

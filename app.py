@@ -5,6 +5,7 @@ import os
 import json
 import ssl
 from slack import WebClient
+from slack.errors import SlackApiError
 import calendar_api
 import time
 
@@ -17,9 +18,6 @@ ssl_context.check_hostname = False
 ssl_context.verify_mode = ssl.CERT_NONE
 
 slack_client = WebClient(token=SLACK_BOT_TOKEN, ssl=ssl_context)
-
-# service = calendar_api.get_service_local_creds()  # use this if you are using local credentials
-
 app = Flask(__name__)
 
 
@@ -59,14 +57,20 @@ def message_actions():
     json_pretty(insert_response)
 
     if insert_response["status"] == 'confirmed':
-        response = slack_client.chat_postMessage(
-            channel=form_json["channel"]["id"],
-            thread_ts=form_json["message"]["ts"],
-            text=form_json["actions"][0]["selected_option"]["value"].split("T")[0] + " "
-            + form_json["actions"][0]["selected_option"]["text"]["text"] + " scheduled ✅"
-        )
 
-    return make_response("", 200)
+        try:
+            slack_client.chat_postMessage(
+                channel=form_json["channel"]["id"],
+                thread_ts=form_json["message"]["ts"],
+                text=form_json["actions"][0]["selected_option"]["value"].split("T")[0] + " "
+                + form_json["actions"][0]["selected_option"]["text"]["text"] + " scheduled ✅"
+            )
+        except SlackApiError as e:
+            if e.response["error"] == 'user_not_found':
+                print(user_email + " channel_id:" + channel_id + " " + e.response["error"])
+                print("Possible incorrect channel_id or deleted account.")
+            else:
+                print(e.response["error"] + " " + user_email)
 
 
 def json_pretty(json_block):
