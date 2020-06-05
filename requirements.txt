@@ -8,3 +8,4 @@ pytz
 google-auth-httplib2
 google-auth-oauthlib
 schedule
+boto3

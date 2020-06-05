@@ -17,14 +17,24 @@ provider:
   name: aws
   runtime: python3.7
   stage: ${opt:stage}
-  region: us-east-1
+  region: ${opt:region, 'us-east-1'}
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+       - dynamodb:Scan
+       - dynamodb:UpdateItem
+       - dynamodb:DeleteItem
+      Resource:
+       - "arn:aws:dynamodb:us-east-1:342334665963:table/interviewers"
+       - "arn:aws:dynamodb:us-east-1:342334665963:table/interviewers_test"
 
 functions:
 
   send_messages:
     handler: send_messages.lambda_handler
+    timeout: 600
     events:
-      - schedule: cron(0 14 ? * 1 *) #2pm utc friday
+      - schedule: cron(0 13 ? * 6 *) #2pm utc friday
     environment:
       SLACK_BOT_TOKEN: ${env:SLACK_BOT_TOKEN}
       SLACK_VERIFICATION_TOKEN: ${env:SLACK_VERIFICATION_TOKEN}
@@ -34,6 +44,9 @@ functions:
       SVC_ACCOUNT_EMAIL: ${env:SVC_ACCOUNT_EMAIL}
       SVC_ACCOUNT_ID: ${env:SVC_ACCOUNT_ID}
       SVC_ACCOUNT_X509_CERT_URL: ${env:SVC_ACCOUNT_X509_CERT_URL}
+      INTERVIEWERS_TABLE: ${env:INTERVIEWERS_TABLE}
+      REGION: ${self:provider.region}
+      READ_ONLY_EMAIL: ${env:READ_ONLY_EMAIL}
 
   app:
     handler: wsgi_handler.handler
