@@ -44,9 +44,9 @@ functions:
       SVC_ACCOUNT_EMAIL: ${env:SVC_ACCOUNT_EMAIL}
       SVC_ACCOUNT_ID: ${env:SVC_ACCOUNT_ID}
       SVC_ACCOUNT_X509_CERT_URL: ${env:SVC_ACCOUNT_X509_CERT_URL}
-      INTERVIEWERS_TABLE: ${env:INTERVIEWERS_TABLE}
+      INTERVIEWERS_TABLE: ${env:INTERVIEWERS_TABLE, 'interviewers'}
       REGION: ${self:provider.region}
-      READ_ONLY_EMAIL: ${env:READ_ONLY_EMAIL}
+      READ_ONLY_EMAIL: ${env:READ_ONLY_EMAIL, 'ashok.gadepalli@contino.io'}
 
   app:
     handler: wsgi_handler.handler
