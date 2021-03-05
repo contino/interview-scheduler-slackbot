@@ -14,8 +14,6 @@ from googleapiclient.errors import HttpError
 import json
 
 SCOPES = ['https://www.googleapis.com/auth/calendar', 'https://www.googleapis.com/auth/calendar.events']
-INTERVIEW_AVAIL_CAL = os.environ["INTERVIEW_AVAIL_CAL"]
-READ_ONLY_EMAIL = os.environ['READ_ONLY_EMAIL']
 
 
 def get_service_local_creds():
