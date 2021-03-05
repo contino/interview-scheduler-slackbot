@@ -13,9 +13,9 @@ from google.oauth2 import service_account
 from googleapiclient.errors import HttpError
 import json
 
-SCOPES = ['https://www.googleapis.com/auth/calendar.readonly', 'https://www.googleapis.com/auth/calendar.events']
+SCOPES = ['https://www.googleapis.com/auth/calendar', 'https://www.googleapis.com/auth/calendar.events']
 INTERVIEW_AVAIL_CAL = os.environ["INTERVIEW_AVAIL_CAL"]
-
+READ_ONLY_EMAIL = os.environ['READ_ONLY_EMAIL']
 
 def get_service_local_creds():
 
@@ -180,6 +180,19 @@ def get_free_slots_for_day(hours, appointments, duration, date, timezone):
 
     return slots_for_day
 
+def get_calendar_writers_and_owners(service, calendar):
+
+    writers_and_owners = []
+
+    acl = service.acl().list(calendarId=calendar).execute()
+
+    for item in acl['items']:
+
+        if item['scope']['type'] == 'user' and str(item['scope']['value']).endswith('contino.io'):
+
+            writers_and_owners.append(item['scope']['value'])
+
+    return writers_and_owners
 
 def get_user_calendar(service, calendar):
     try:
