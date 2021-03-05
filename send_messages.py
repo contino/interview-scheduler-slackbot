@@ -58,6 +58,7 @@ def remove_user_from_db(dynamodb_client, table_name, user_email):
     if response["ResponseMetadata"]["HTTPStatusCode"] == 200:
         print(user_email + " has been removed from the database.")
 
+
 def update_dynamodb_table(dynamodb_client, user_list, table_name):
 
     slack_user_list = get_user_list('', [])  # recursive
@@ -92,6 +93,7 @@ def update_dynamodb_table(dynamodb_client, user_list, table_name):
                     })
 
             print(item["id"] + " " + item["profile"]["real_name_normalized"] + " " + item["profile"]["email"] + " " + str(response["ResponseMetadata"]["HTTPStatusCode"]))
+
 
 def lambda_handler(event, context):
 

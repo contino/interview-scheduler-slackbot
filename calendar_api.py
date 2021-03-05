@@ -17,6 +17,7 @@ SCOPES = ['https://www.googleapis.com/auth/calendar', 'https://www.googleapis.co
 INTERVIEW_AVAIL_CAL = os.environ["INTERVIEW_AVAIL_CAL"]
 READ_ONLY_EMAIL = os.environ['READ_ONLY_EMAIL']
 
+
 def get_service_local_creds():
 
     creds = None
@@ -180,6 +181,7 @@ def get_free_slots_for_day(hours, appointments, duration, date, timezone):
 
     return slots_for_day
 
+
 def get_calendar_writers_and_owners(service, calendar):
 
     writers_and_owners = []
@@ -193,6 +195,7 @@ def get_calendar_writers_and_owners(service, calendar):
             writers_and_owners.append(item['scope']['value'])
 
     return writers_and_owners
+
 
 def get_user_calendar(service, calendar):
     try:
