@@ -109,8 +109,6 @@ def lambda_handler(event, context):
 
     for interviewer in interviewer_list:
 
-        print(interviewer["real_name_normalized"]["S"])
-
         if interviewer["email_id"]["S"] not in already_signed_up_users:
 
             calendar_status = calendar_api.get_user_calendar(service, interviewer["email_id"]["S"])
