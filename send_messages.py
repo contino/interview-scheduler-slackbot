@@ -59,12 +59,54 @@ def remove_user_from_db(dynamodb_client, table_name, user_email):
         print(user_email + " has been removed from the database.")
 
 
+def update_dynamodb_table(dynamodb_client, user_list, table_name):
+
+    slack_user_list = get_user_list('', [])  # recursive
+
+    for item in slack_user_list:
+
+        if "email" in item["profile"] and item["profile"]["email"] in user_list:
+
+            response = dynamodb_client.update_item(
+                    TableName=table_name,
+                    Key={
+                        'email_id': {
+                            'S': item["profile"]["email"],
+                        }
+                    },
+                    AttributeUpdates={
+                        'channel_id': {
+                            'Value': {
+                                'S': item["id"]
+                            }
+                        },
+                        'real_name_normalized': {
+                            'Value': {
+                                'S': item["profile"]["real_name_normalized"]
+                            }
+                        },
+                        'interviews_done': {
+                            'Value': {
+                                'N': '0'
+                            }
+                        }
+                    })
+
+            print(item["id"] + " " + item["profile"]["real_name_normalized"] + " " + item["profile"]["email"] + " " + str(response["ResponseMetadata"]["HTTPStatusCode"]))
+
+
 def lambda_handler(event, context):
 
     service = calendar_api.get_service_delegated(READ_ONLY_EMAIL)  # use this if you are using a Google Cloud API service account
     # service = calendar_api.get_service_local_creds()  # use this if you are using local credentials
     already_signed_up_users = get_already_signed_up_users(service)
+
     dynamodb_client = boto3.client('dynamodb', region_name=AWS_REGION)
+
+    calendar_writers_and_owners = calendar_api.get_calendar_writers_and_owners(service, INTERVIEW_AVAIL_CAL)
+
+    update_dynamodb_table(dynamodb_client, calendar_writers_and_owners, 'interviewers')
+
     interviewer_list = get_users_from_dynamodb(dynamodb_client, INTERVIEWERS_TABLE)
 
     for interviewer in interviewer_list:
