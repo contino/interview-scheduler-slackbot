@@ -13,7 +13,7 @@ from google.oauth2 import service_account
 from googleapiclient.errors import HttpError
 import json
 
-SCOPES = ['https://www.googleapis.com/auth/calendar', 'https://www.googleapis.com/auth/calendar.events']
+SCOPES = ['https://www.googleapis.com/auth/calendar']
 
 
 def get_service_local_creds():
