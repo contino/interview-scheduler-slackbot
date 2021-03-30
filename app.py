@@ -72,6 +72,7 @@ def message_actions():
             else:
                 print(e.response["error"] + " " + user_email)
 
+    return make_response("", 200)
 
 def json_pretty(json_block):
 
